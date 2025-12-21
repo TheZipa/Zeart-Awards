@@ -1,0 +1,664 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Zeart Awards 2025</title>
+
+  <link rel="icon" href="./favicon.ico" sizes="any">
+  <link rel="icon" type="image/png" href="./favicon-32.png" sizes="32x32">
+  <link rel="icon" type="image/png" href="./favicon-16.png" sizes="16x16">
+  <link rel="apple-touch-icon" href="./apple-touch-icon.png">
+  <meta property="og:title" content="Zeart Awards 2025">
+  <meta property="og:image" content="./og-image.png">
+
+  <style>
+    :root{
+      --bg0:#070A12;
+      --bg1:#0B0F1C;
+      --card: rgba(255,255,255,.06);
+      --card2: rgba(255,255,255,.09);
+      --stroke: rgba(255,255,255,.12);
+      --text: rgba(255,255,255,.90);
+      --muted: rgba(255,255,255,.65);
+      --muted2: rgba(255,255,255,.50);
+      --shadow: 0 18px 70px rgba(0,0,0,.55);
+      --r: 22px;
+
+      --a: #7C5CFF;
+      --b: #00D4FF;
+      --c: #FF4FD8;
+      --d: #FFB800;
+    }
+
+    *{ box-sizing: border-box; }
+    html,body{ height:100%; }
+    body{
+      margin:0;
+      font-family: Manrope, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      background: radial-gradient(1200px 800px at 20% 10%, rgba(124,92,255,.22), transparent 55%),
+                  radial-gradient(1100px 700px at 85% 30%, rgba(0,212,255,.18), transparent 55%),
+                  radial-gradient(900px 650px at 50% 95%, rgba(255,79,216,.12), transparent 60%),
+                  linear-gradient(180deg, var(--bg0), var(--bg1));
+      color: var(--text);
+      overflow: hidden; /* скроллим внутри .pages */
+    }
+
+    /* subtle noise */
+    body::before{
+      content:"";
+      position: fixed;
+      inset:0;
+      pointer-events:none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='220' height='220' filter='url(%23n)' opacity='.18'/%3E%3C/svg%3E");
+      mix-blend-mode: overlay;
+      opacity: .22;
+    }
+
+    .topbar{
+      position: fixed;
+      top: 18px;
+      left: 18px;
+      right: 18px;
+      z-index: 50;
+      display:flex;
+      align-items:center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 10px 14px;
+      border-radius: 999px;
+      background: rgba(0,0,0,.22);
+      border: 1px solid rgba(255,255,255,.10);
+      backdrop-filter: blur(14px);
+      box-shadow: 0 10px 50px rgba(0,0,0,.35);
+    }
+
+    .brand{
+      display:flex; align-items:center; gap:10px;
+      min-width: 220px;
+    }
+    .logo{
+      width: 34px; height: 34px;
+      border-radius: 12px;
+      background: conic-gradient(from 210deg, var(--a), var(--b), var(--c), var(--d), var(--a));
+      box-shadow: 0 12px 40px rgba(124,92,255,.18);
+      position: relative;
+      overflow:hidden;
+    }
+    .logo::after{
+      content:"";
+      position:absolute; inset:-40%;
+      background: radial-gradient(circle at 30% 30%, rgba(255,255,255,.35), transparent 55%);
+      transform: rotate(18deg);
+    }
+    .brand h1{
+      margin:0;
+      font-size: 14px;
+      letter-spacing: .2px;
+      font-weight: 800;
+      line-height: 1.05;
+    }
+    .brand span{
+      display:block;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--muted);
+    }
+
+    .nav{
+      display:flex; align-items:center; gap: 8px;
+      overflow:auto;
+      scrollbar-width: none;
+      max-width: 55vw;
+    }
+    .nav::-webkit-scrollbar{ display:none; }
+
+    .pill{
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.06);
+      color: var(--text);
+      padding: 8px 12px;
+      border-radius: 999px;
+      cursor: pointer;
+      user-select: none;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: .15px;
+      transition: transform .15s ease, background .15s ease, border-color .15s ease;
+      white-space: nowrap;
+    }
+    .pill:hover{ transform: translateY(-1px); background: rgba(255,255,255,.09); }
+    .pill.active{
+      background: linear-gradient(90deg, rgba(124,92,255,.28), rgba(0,212,255,.22));
+      border-color: rgba(255,255,255,.20);
+    }
+
+    .right{
+      display:flex; align-items:center; gap:10px;
+      min-width: 220px;
+      justify-content: flex-end;
+    }
+    .mini{
+      display:flex; flex-direction: column; align-items: flex-end;
+      line-height: 1.1;
+    }
+    .mini b{ font-size: 12px; }
+    .mini i{ font-style: normal; font-size: 11px; color: var(--muted); }
+
+    .btn{
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.08);
+      color: var(--text);
+      border-radius: 999px;
+      padding: 9px 12px;
+      cursor:pointer;
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      font-weight: 800;
+      font-size: 12px;
+      transition: transform .15s ease, background .15s ease, border-color .15s ease;
+    }
+    .btn:hover{ transform: translateY(-1px); background: rgba(255,255,255,.10); border-color: rgba(255,255,255,.22); }
+    .btn:active{ transform: translateY(0px); }
+
+    .pages{
+      height: 100vh;
+      overflow-y: auto;
+      scroll-snap-type: y mandatory;
+      scroll-behavior: smooth;
+      padding: 88px 18px 18px;
+    }
+
+    .page{
+      scroll-snap-align: start;
+      min-height: calc(100vh - 106px);
+      display:flex;
+      align-items: center;
+      justify-content: center;
+      padding: 18px 0 40px;
+    }
+
+    .wrap{
+      width: min(1100px, calc(100vw - 36px));
+      display:grid;
+      grid-template-columns: 1.05fr .95fr;
+      gap: 18px;
+      align-items: stretch;
+    }
+
+    @media (max-width: 980px){
+      .wrap{ grid-template-columns: 1fr; }
+      .right, .brand{ min-width: unset; }
+      .nav{ max-width: 65vw; }
+    }
+
+    .panel{
+      border-radius: var(--r);
+      background: linear-gradient(180deg, rgba(255,255,255,.07), rgba(255,255,255,.04));
+      border: 1px solid rgba(255,255,255,.12);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(16px);
+      overflow:hidden;
+      position: relative;
+    }
+    .panel::before{
+      content:"";
+      position:absolute;
+      inset:-1px;
+      background: radial-gradient(700px 260px at 30% 0%, rgba(124,92,255,.18), transparent 60%),
+                  radial-gradient(700px 260px at 80% 0%, rgba(0,212,255,.14), transparent 60%);
+      opacity:.9;
+      pointer-events:none;
+    }
+
+    .panel > *{ position: relative; z-index: 2; }
+
+    .hero{
+      padding: 28px 26px 26px;
+    }
+    .kicker{
+      display:inline-flex;
+      align-items:center;
+      gap:10px;
+      padding: 9px 12px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(0,0,0,.18);
+      color: var(--muted);
+      font-weight: 700;
+      font-size: 12px;
+    }
+    .dot{
+      width: 8px; height:8px; border-radius: 999px;
+      background: conic-gradient(from 210deg, var(--a), var(--b), var(--c), var(--d), var(--a));
+      box-shadow: 0 0 0 6px rgba(124,92,255,.10);
+    }
+    .title{
+      margin: 14px 0 10px;
+      font-size: clamp(28px, 3.4vw, 44px);
+      line-height: 1.05;
+      letter-spacing: -0.5px;
+      font-weight: 900;
+    }
+    .subtitle{
+      margin: 0 0 18px;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.55;
+    }
+
+    .meta{
+      display:flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 12px;
+    }
+    .chip{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding: 10px 12px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.06);
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+    }
+    .chip b{ color: var(--text); font-weight: 900; }
+
+    .nomBox{
+      padding: 20px;
+      display:flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .nomHeader{
+      display:flex;
+      justify-content: space-between;
+      align-items:flex-start;
+      gap: 10px;
+    }
+    .nomHeader h2{
+      margin:0;
+      font-size: 18px;
+      font-weight: 900;
+      letter-spacing: .2px;
+      line-height: 1.15;
+    }
+    .nomHeader p{
+      margin:6px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.45;
+      max-width: 55ch;
+    }
+
+    .badge{
+      padding: 10px 12px;
+      border-radius: 999px;
+      font-weight: 900;
+      font-size: 12px;
+      border: 1px solid rgba(255,255,255,.16);
+      background: linear-gradient(90deg, rgba(124,92,255,.22), rgba(0,212,255,.18));
+      white-space: nowrap;
+      box-shadow: 0 12px 50px rgba(0,0,0,.35);
+    }
+
+    .grid{
+      display:grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 8px;
+    }
+    @media (max-width: 560px){
+      .grid{ grid-template-columns: 1fr; }
+    }
+
+    .card{
+      border-radius: 18px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.06);
+      padding: 12px;
+      display:flex;
+      gap: 12px;
+      align-items: center;
+      transition: transform .16s ease, background .16s ease, border-color .16s ease;
+      position: relative;
+      overflow:hidden;
+    }
+    .card::before{
+      content:"";
+      position:absolute;
+      inset:-1px;
+      background: radial-gradient(240px 160px at 10% 20%, rgba(255,255,255,.12), transparent 60%),
+                  radial-gradient(240px 160px at 90% 40%, rgba(124,92,255,.10), transparent 60%);
+      opacity: 0;
+      transition: opacity .16s ease;
+      pointer-events:none;
+    }
+    .card:hover{
+      transform: translateY(-2px);
+      background: rgba(255,255,255,.08);
+      border-color: rgba(255,255,255,.18);
+    }
+    .card:hover::before{ opacity: 1; }
+
+    .ava{
+      width: 44px; height: 44px;
+      border-radius: 14px;
+      flex: 0 0 auto;
+      overflow:hidden;
+      border: 1px solid rgba(255,255,255,.16);
+      background: rgba(255,255,255,.06);
+    }
+    .ava img{
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display:block;
+    }
+    .who{
+      min-width: 0;
+      display:flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .nick{
+      font-weight: 900;
+      font-size: 13px;
+      letter-spacing: .1px;
+      white-space: nowrap;
+      overflow:hidden;
+      text-overflow: ellipsis;
+    }
+    .tag{
+      color: var(--muted2);
+      font-weight: 700;
+      font-size: 12px;
+      white-space: nowrap;
+      overflow:hidden;
+      text-overflow: ellipsis;
+    }
+
+    .footerHint{
+      position: fixed;
+      bottom: 14px;
+      left: 50%;
+      transform: translateX(-50%);
+      display:flex;
+      align-items:center;
+      gap: 10px;
+      z-index: 60;
+      padding: 10px 14px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(0,0,0,.22);
+      backdrop-filter: blur(14px);
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 800;
+      user-select:none;
+    }
+    .arrow{
+      width: 10px; height: 10px;
+      border-right: 2px solid rgba(255,255,255,.55);
+      border-bottom: 2px solid rgba(255,255,255,.55);
+      transform: rotate(45deg);
+      animation: bounce 1.25s ease-in-out infinite;
+      margin-left: 2px;
+    }
+    @keyframes bounce{
+      0%,100%{ transform: translateY(0) rotate(45deg); opacity: .85; }
+      50%{ transform: translateY(4px) rotate(45deg); opacity: .55; }
+    }
+
+    /* appear animation */
+    .reveal{
+      opacity: 0;
+      transform: translateY(10px);
+      transition: opacity .35s ease, transform .35s ease;
+    }
+    .reveal.on{
+      opacity: 1;
+      transform: translateY(0);
+    }
+  </style>
+</head>
+
+<body>
+  <div class="topbar">
+    <div class="brand">
+      <div class="logo" aria-hidden="true">
+        <img src="./icon-192.png" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:12px;">
+      </div>
+      <div>
+        <h1>Zeart Awards 2025</h1>
+        <span id="subtitleTop">Годовые номинации сервера</span>
+      </div>
+    </div>
+
+    <div class="nav" id="nav"></div>
+
+    <div class="right">
+      <div class="mini">
+        <b id="progressText">0 / 0</b>
+        <i>номинаций</i>
+      </div>
+      <button class="btn" id="nextBtn" title="Следующая номинация">
+        Далее <span class="arrow" style="animation:none; margin:0; transform: rotate(45deg)"></span>
+      </button>
+    </div>
+  </div>
+
+  <div class="pages" id="pages"></div>
+
+  <div class="footerHint" id="hint">
+    Скролль вниз <span class="arrow"></span>
+  </div>
+
+  <script>
+    const DEFAULT_CONFIG = {
+      siteTitle: "Zeart Awards 2025",
+      siteSubtitle: "Годовые номинации участников Discord сервера",
+      nominations: [
+        {
+          id: "meme",
+          title: "Мем года",
+          description: "Кто сделал год веселее всех — по версии легенд.",
+          nominees: [
+            { name: "Zeart", tag: "@zeart", avatarUrl: "https://cdn.discordapp.com/embed/avatars/0.png" },
+            { name: "Luna", tag: "@luna", avatarUrl: "https://cdn.discordapp.com/embed/avatars/1.png" },
+            { name: "Vlad", tag: "@vlad", avatarUrl: "https://cdn.discordapp.com/embed/avatars/2.png" },
+            { name: "Kira", tag: "@kira", avatarUrl: "https://cdn.discordapp.com/embed/avatars/3.png" },
+          ]
+        },
+        {
+          id: "helper",
+          title: "Помощник года",
+          description: "Всегда рядом, всегда в теме, всегда спасает.",
+          nominees: [
+            { name: "Nova", tag: "@nova", avatarUrl: "https://cdn.discordapp.com/embed/avatars/4.png" },
+            { name: "Rex", tag: "@rex", avatarUrl: "https://cdn.discordapp.com/embed/avatars/5.png" },
+          ]
+        }
+      ]
+    };
+
+    const pages = document.getElementById('pages');
+    const nav = document.getElementById('nav');
+    const progressText = document.getElementById('progressText');
+    const nextBtn = document.getElementById('nextBtn');
+    const subtitleTop = document.getElementById('subtitleTop');
+    const hint = document.getElementById('hint');
+
+    let cfg = null;
+    let sections = [];
+    let pills = [];
+    let currentIndex = 0;
+
+    async function loadConfig() {
+      try {
+        const r = await fetch('./config.json', { cache: 'no-store' });
+        if (!r.ok) throw new Error('no config.json');
+        return await r.json();
+      } catch (e) {
+        return DEFAULT_CONFIG;
+      }
+    }
+
+    function el(tag, cls, html){
+      const x = document.createElement(tag);
+      if (cls) x.className = cls;
+      if (html !== undefined) x.innerHTML = html;
+      return x;
+    }
+
+    function render() {
+      document.title = cfg.siteTitle || "Zeart Awards 2025";
+      subtitleTop.textContent = cfg.siteSubtitle || "Годовые номинации";
+
+      pages.innerHTML = '';
+      nav.innerHTML = '';
+      sections = [];
+      pills = [];
+      currentIndex = 0;
+
+      const nominations = Array.isArray(cfg.nominations) ? cfg.nominations : [];
+
+      progressText.textContent = `1 / ${Math.max(1, nominations.length)}`;
+
+      nominations.forEach((nom, idx) => {
+        const pill = el('div', 'pill', nom.shortTitle || nom.title || `Номинация ${idx+1}`);
+        pill.addEventListener('click', () => scrollToIndex(idx));
+        nav.appendChild(pill);
+        pills.push(pill);
+
+        const page = el('section', 'page');
+        page.dataset.index = String(idx);
+
+        const wrap = el('div', 'wrap');
+
+        // Left: hero-ish panel
+        const left = el('div', 'panel hero reveal');
+        const kicker = el('div', 'kicker', `<span class="dot" aria-hidden="true"></span> Zeart Awards • 2025`);
+        const title = el('div', 'title', nom.title || `Номинация ${idx+1}`);
+        const subtitle = el('div', 'subtitle', nom.description || '—');
+
+        const meta = el('div', 'meta');
+        const nCount = Array.isArray(nom.nominees) ? nom.nominees.length : 0;
+        meta.appendChild(el('div', 'chip', `Номинантов: <b>${nCount}</b>`));
+        meta.appendChild(el('div', 'chip', `Позиция: <b>${idx+1}</b> / <b>${nominations.length}</b>`));
+
+        left.appendChild(kicker);
+        left.appendChild(title);
+        left.appendChild(subtitle);
+        left.appendChild(meta);
+
+        // Right: nominees panel
+        const right = el('div', 'panel nomBox reveal');
+
+        const header = el('div', 'nomHeader');
+        const h = el('div');
+        h.appendChild(el('h2', '', 'Номинанты'));
+        h.appendChild(el('p', '', 'Аватар и ник берутся из config.json (его можно сгенерировать из Discord скриптом).'));
+        header.appendChild(h);
+        header.appendChild(el('div', 'badge', `#${idx+1}`));
+
+        const grid = el('div', 'grid');
+
+        (nom.nominees || []).forEach((p) => {
+          const card = el('div', 'card');
+          const ava = el('div', 'ava');
+          const img = document.createElement('img');
+          img.loading = "lazy";
+          img.alt = p.name || "nominee";
+          img.src = p.avatarUrl || "https://cdn.discordapp.com/embed/avatars/0.png";
+          ava.appendChild(img);
+
+          const who = el('div', 'who');
+          who.appendChild(el('div', 'nick', escapeHtml(p.name || "Unknown")));
+          who.appendChild(el('div', 'tag', escapeHtml(p.tag || "")));
+
+          card.appendChild(ava);
+          card.appendChild(who);
+          grid.appendChild(card);
+        });
+
+        right.appendChild(header);
+        right.appendChild(grid);
+
+        wrap.appendChild(left);
+        wrap.appendChild(right);
+
+        page.appendChild(wrap);
+        pages.appendChild(page);
+        sections.push(page);
+      });
+
+      // активируем pill 0
+      setActive(0);
+
+      // observer для reveal-анимаций
+      const io = new IntersectionObserver((entries) => {
+        for (const e of entries){
+          if (e.isIntersecting) e.target.classList.add('on');
+        }
+      }, { threshold: 0.15 });
+
+      document.querySelectorAll('.reveal').forEach(n => io.observe(n));
+    }
+
+    function escapeHtml(s){
+      return String(s).replace(/[&<>"']/g, (m) => ({
+        "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
+      }[m]));
+    }
+
+    function setActive(i){
+      currentIndex = Math.max(0, Math.min(i, sections.length - 1));
+      pills.forEach((p, idx) => p.classList.toggle('active', idx === currentIndex));
+      progressText.textContent = `${currentIndex + 1} / ${sections.length}`;
+      hint.style.opacity = currentIndex >= sections.length - 1 ? 0 : 1;
+    }
+
+    function scrollToIndex(i){
+      const s = sections[i];
+      if (!s) return;
+      s.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      setActive(i);
+    }
+
+    function findClosestIndex(){
+      // ищем секцию, чей top ближе к верху контейнера
+      const containerTop = pages.getBoundingClientRect().top;
+      let best = 0;
+      let bestDist = Infinity;
+      sections.forEach((s, idx) => {
+        const d = Math.abs(s.getBoundingClientRect().top - containerTop);
+        if (d < bestDist){
+          bestDist = d;
+          best = idx;
+        }
+      });
+      return best;
+    }
+
+    pages.addEventListener('scroll', () => {
+      const i = findClosestIndex();
+      setActive(i);
+    }, { passive: true });
+
+    nextBtn.addEventListener('click', () => {
+      scrollToIndex(Math.min(currentIndex + 1, sections.length - 1));
+    });
+
+    (async function init(){
+      cfg = await loadConfig();
+      render();
+    })();
+  </script>
+</body>
+</html>
