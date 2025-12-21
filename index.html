@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Zeart Awards 2025</title>
 
+  <!-- Icons -->
   <link rel="icon" href="./favicon.ico" sizes="any">
   <link rel="icon" type="image/png" href="./favicon-32.png" sizes="32x32">
   <link rel="icon" type="image/png" href="./favicon-16.png" sizes="16x16">
@@ -12,16 +13,17 @@
   <meta property="og:title" content="Zeart Awards 2025">
   <meta property="og:image" content="./og-image.png">
 
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+
   <style>
     :root{
       --bg0:#070A12;
       --bg1:#0B0F1C;
-      --card: rgba(255,255,255,.06);
-      --card2: rgba(255,255,255,.09);
-      --stroke: rgba(255,255,255,.12);
-      --text: rgba(255,255,255,.90);
-      --muted: rgba(255,255,255,.65);
-      --muted2: rgba(255,255,255,.50);
+      --text: rgba(255,255,255,.92);
+      --muted: rgba(255,255,255,.68);
+      --muted2: rgba(255,255,255,.52);
       --shadow: 0 18px 70px rgba(0,0,0,.55);
       --r: 22px;
 
@@ -29,10 +31,59 @@
       --b: #00D4FF;
       --c: #FF4FD8;
       --d: #FFB800;
+
+      /* computed from topbar size */
+      --topOffset: 98px;
     }
 
     *{ box-sizing: border-box; }
     html,body{ height:100%; }
+
+    /* Custom scrollbar (pages + dropdown menu) */
+    .pages{
+      scrollbar-width: thin;
+      scrollbar-color: rgba(255,255,255,.22) rgba(255,255,255,.06);
+      scrollbar-gutter: stable;
+    }
+    .pages::-webkit-scrollbar{ width: 10px; }
+    .pages::-webkit-scrollbar-track{
+      background: rgba(255,255,255,.04);
+      border-left: 1px solid rgba(255,255,255,.06);
+    }
+    .pages::-webkit-scrollbar-thumb{
+      background: linear-gradient(180deg, rgba(124,92,255,.45), rgba(0,212,255,.32));
+      border: 2px solid rgba(255,255,255,.06);
+      border-radius: 999px;
+      box-shadow: 0 10px 20px rgba(0,0,0,.25);
+    }
+    .topSpacer{
+      height: calc(var(--topOffset) + 10px);
+      scroll-snap-align: none;
+    }
+    .bottomSpacer{
+      height: 96px;
+      scroll-snap-align: none;
+    }
+
+    .pages::-webkit-scrollbar-thumb:hover{
+      background: linear-gradient(180deg, rgba(124,92,255,.58), rgba(0,212,255,.45));
+    }
+
+    .menu{
+      scrollbar-width: thin;
+      scrollbar-color: rgba(255,255,255,.22) rgba(255,255,255,.06);
+    }
+    .menu::-webkit-scrollbar{ width: 9px; }
+    .menu::-webkit-scrollbar-track{
+      background: rgba(255,255,255,.03);
+      border-radius: 999px;
+    }
+    .menu::-webkit-scrollbar-thumb{
+      background: linear-gradient(180deg, rgba(255,79,216,.38), rgba(255,184,0,.30));
+      border: 2px solid rgba(0,0,0,.18);
+      border-radius: 999px;
+    }
+
     body{
       margin:0;
       font-family: Manrope, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
@@ -41,10 +92,9 @@
                   radial-gradient(900px 650px at 50% 95%, rgba(255,79,216,.12), transparent 60%),
                   linear-gradient(180deg, var(--bg0), var(--bg1));
       color: var(--text);
-      overflow: hidden; /* скроллим внутри .pages */
+      overflow: hidden;
     }
 
-    /* subtle noise */
     body::before{
       content:"";
       position: fixed;
@@ -55,17 +105,30 @@
       opacity: .22;
     }
 
+    #fx{
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 40;
+      pointer-events: none;
+    }
+
     .topbar{
+      transition: opacity 320ms ease, transform 320ms ease;
+
       position: fixed;
       top: 18px;
       left: 18px;
       right: 18px;
       z-index: 50;
-      display:flex;
-      align-items:center;
-      justify-content: space-between;
+
+      display: grid;
+      grid-template-columns: 260px 1fr 260px;
+      align-items: center;
+
       gap: 12px;
-      padding: 10px 14px;
+      padding: 12px 16px;
       border-radius: 999px;
       background: rgba(0,0,0,.22);
       border: 1px solid rgba(255,255,255,.10);
@@ -73,127 +136,227 @@
       box-shadow: 0 10px 50px rgba(0,0,0,.35);
     }
 
-    .brand{
-      display:flex; align-items:center; gap:10px;
-      min-width: 220px;
+    .topbar.noTrans{ transition: none !important; }
+
+    .topbar.isHidden{
+      opacity: 0;
+      transform: translateY(-14px);
+      pointer-events: none;
     }
-    .logo{
-      width: 34px; height: 34px;
-      border-radius: 12px;
-      background: conic-gradient(from 210deg, var(--a), var(--b), var(--c), var(--d), var(--a));
-      box-shadow: 0 12px 40px rgba(124,92,255,.18);
-      position: relative;
-      overflow:hidden;
+
+    .brandCenter{
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap: 12px;
+      min-width: 0;
     }
-    .logo::after{
-      content:"";
-      position:absolute; inset:-40%;
-      background: radial-gradient(circle at 30% 30%, rgba(255,255,255,.35), transparent 55%);
-      transform: rotate(18deg);
+
+    .brandIcon{
+      width: 56px;
+      height: 56px;
+      border-radius: 18px;
+      overflow: hidden;
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.06);
+      box-shadow: 0 18px 55px rgba(0,0,0,.35);
+      flex: 0 0 auto;
     }
-    .brand h1{
-      margin:0;
-      font-size: 14px;
-      letter-spacing: .2px;
-      font-weight: 800;
+    .brandIcon img{
+      width:100%;
+      height:100%;
+      object-fit: cover;
+      display:block;
+    }
+
+    .brandText{
+      display:flex;
+      flex-direction: column;
+      gap: 2px;
+      align-items: center;
+      text-align: center;
       line-height: 1.05;
+      min-width: 0;
     }
-    .brand span{
+    .brandText h1{
+      margin:0;
+      font-size: 15px;
+      letter-spacing: .2px;
+      font-weight: 900;
+      white-space: nowrap;
+    }
+    .brandText span{
       display:block;
       font-size: 12px;
-      font-weight: 600;
+      font-weight: 800;
       color: var(--muted);
+      white-space: nowrap;
+      max-width: min(54vw, 720px);
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
-    .nav{
-      display:flex; align-items:center; gap: 8px;
-      overflow:auto;
-      scrollbar-width: none;
-      max-width: 55vw;
+    .navWrap{
+      display:flex;
+      justify-content: flex-end;
+      min-width: 0;
     }
-    .nav::-webkit-scrollbar{ display:none; }
 
-    .pill{
+    .dropdown{
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      justify-content: flex-end;
+      width: 100%;
+    }
+    .ddBtn{
       border: 1px solid rgba(255,255,255,.12);
       background: rgba(255,255,255,.06);
       color: var(--text);
-      padding: 8px 12px;
+      padding: 10px 12px;
       border-radius: 999px;
       cursor: pointer;
-      user-select: none;
       font-size: 12px;
-      font-weight: 700;
+      font-weight: 900;
       letter-spacing: .15px;
-      transition: transform .15s ease, background .15s ease, border-color .15s ease;
-      white-space: nowrap;
-    }
-    .pill:hover{ transform: translateY(-1px); background: rgba(255,255,255,.09); }
-    .pill.active{
-      background: linear-gradient(90deg, rgba(124,92,255,.28), rgba(0,212,255,.22));
-      border-color: rgba(255,255,255,.20);
-    }
-
-    .right{
-      display:flex; align-items:center; gap:10px;
-      min-width: 220px;
-      justify-content: flex-end;
-    }
-    .mini{
-      display:flex; flex-direction: column; align-items: flex-end;
-      line-height: 1.1;
-    }
-    .mini b{ font-size: 12px; }
-    .mini i{ font-style: normal; font-size: 11px; color: var(--muted); }
-
-    .btn{
-      border: 1px solid rgba(255,255,255,.14);
-      background: rgba(255,255,255,.08);
-      color: var(--text);
-      border-radius: 999px;
-      padding: 9px 12px;
-      cursor:pointer;
       display:inline-flex;
       align-items:center;
-      gap:8px;
-      font-weight: 800;
-      font-size: 12px;
-      transition: transform .15s ease, background .15s ease, border-color .15s ease;
+      gap: 10px;
+      transition: transform .14s ease, background .14s ease, border-color .14s ease, box-shadow .14s ease;
+      white-space: nowrap;
+      max-width: 100%;
     }
-    .btn:hover{ transform: translateY(-1px); background: rgba(255,255,255,.10); border-color: rgba(255,255,255,.22); }
-    .btn:active{ transform: translateY(0px); }
+    .ddBtn:hover{
+      transform: translateY(-1px);
+      background: rgba(255,255,255,.10);
+      border-color: rgba(255,255,255,.22);
+      box-shadow: 0 10px 28px rgba(0,0,0,.30);
+    }
+    .ddBtn:active{ transform: translateY(0px); box-shadow: none; }
+    .ddBtn:focus-visible{ outline: 2px solid rgba(124,92,255,.60); outline-offset: 2px; }
+    .chev{
+      width: 10px; height: 10px;
+      border-right: 2px solid rgba(255,255,255,.65);
+      border-bottom: 2px solid rgba(255,255,255,.65);
+      transform: rotate(45deg);
+      margin-top: -2px;
+      flex: 0 0 auto;
+    }
+    .ddLabel{
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      min-width: 0;
+    }
 
+    .menu{
+      position: absolute;
+      top: calc(100% + 10px);
+      right: 0;
+      width: min(34vw, 230px);
+      max-height: var(--mediaMaxH);
+      overflow: auto;
+      border-radius: 16px;
+      background: rgba(0,0,0,.40);
+      border: 1px solid rgba(255,255,255,.12);
+      backdrop-filter: blur(16px);
+      box-shadow: 0 18px 70px rgba(0,0,0,.55);
+      padding: 8px;
+      display: none;
+    }
+    .menu.open{ display: block; }
+
+    .menuItem{
+      width: 100%;
+      text-align: left;
+      padding: 9px 10px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.05);
+      color: var(--text);
+      cursor:pointer;
+      font-weight: 900;
+      font-size: 12px;
+      transition: background .14s ease, border-color .14s ease, transform .14s ease;
+      display:flex;
+      gap: 10px;
+      align-items: center;
+    }
+    .menuItem:hover{
+      background: rgba(255,255,255,.08);
+      border-color: rgba(255,255,255,.18);
+      transform: translateY(-1px);
+    }
+    .menuItem.active{
+      background: linear-gradient(90deg, rgba(124,92,255,.26), rgba(0,212,255,.18));
+      border-color: rgba(255,255,255,.22);
+    }
+    .badgeDot{
+      width: 8px; height:8px; border-radius: 999px;
+      background: conic-gradient(from 210deg, var(--a), var(--b), var(--c), var(--d), var(--a));
+      box-shadow: 0 0 0 6px rgba(124,92,255,.10);
+      flex: 0 0 auto;
+    }
+
+    @media (max-width: 880px){
+      .topbar{
+      transition: opacity 320ms ease, transform 320ms ease;
+
+        grid-template-columns: 1fr;
+        border-radius: 26px;
+        padding: 12px;
+      }
+      .brandCenter{ order: 1; }
+      .navWrap{ order: 2; justify-content: center; }
+      .dropdown{ justify-content: center; }
+      .ddBtn{ max-width: 92vw; }
+      .menu{
+        right: 50%;
+        transform: translateX(50%);
+        width: min(78vw, 280px);
+        max-height: var(--mediaMaxH);
+      }
+      .brandText span{ max-width: 86vw; }
+    }
+
+    /* === Pages & snap === */
     .pages{
       height: 100vh;
       overflow-y: auto;
       scroll-snap-type: y mandatory;
       scroll-behavior: smooth;
-      padding: 88px 18px 18px;
+
+      /* Snap should respect the fixed header */
+      scroll-padding-top: calc(var(--topOffset) + 10px);
+
+      /* Layout padding (small) */
+      padding: 18px;
     }
 
     .page{
       scroll-snap-align: start;
-      min-height: calc(100vh - 106px);
+      scroll-margin-top: 0px;
+
+      min-height: calc(100vh - var(--topOffset) - 28px);
       display:flex;
       align-items: center;
       justify-content: center;
-      padding: 18px 0 40px;
+      padding: 18px 0 22px;
     }
 
-    .wrap{
-      width: min(1100px, calc(100vw - 36px));
-      display:grid;
-      grid-template-columns: 1.05fr .95fr;
-      gap: 18px;
-      align-items: stretch;
+    .page[data-kind="nomination"]{
+      align-items: center;
+      padding-top: 18px;
     }
 
-    @media (max-width: 980px){
-      .wrap{ grid-template-columns: 1fr; }
-      .right, .brand{ min-width: unset; }
-      .nav{ max-width: 65vw; }
+.wrap{
+      width: min(1200px, calc(100vw - 36px));
+      display:flex;
+      justify-content: center;
     }
 
     .panel{
+      width: 100%;
       border-radius: var(--r);
       background: linear-gradient(180deg, rgba(255,255,255,.07), rgba(255,255,255,.04));
       border: 1px solid rgba(255,255,255,.12);
@@ -201,268 +364,645 @@
       backdrop-filter: blur(16px);
       overflow:hidden;
       position: relative;
+
+      opacity: 0;
+      transform: scale(.965) translateY(10px);
+      transition: transform 480ms cubic-bezier(.2,.9,.2,1), opacity 480ms cubic-bezier(.2,.9,.2,1);
+      will-change: transform, opacity;
     }
+
     .panel::before{
       content:"";
       position:absolute;
       inset:-1px;
-      background: radial-gradient(700px 260px at 30% 0%, rgba(124,92,255,.18), transparent 60%),
-                  radial-gradient(700px 260px at 80% 0%, rgba(0,212,255,.14), transparent 60%);
+      background: radial-gradient(860px 360px at 30% 0%, rgba(124,92,255,.18), transparent 60%),
+                  radial-gradient(860px 360px at 80% 0%, rgba(0,212,255,.14), transparent 60%);
       opacity:.9;
       pointer-events:none;
     }
-
     .panel > *{ position: relative; z-index: 2; }
 
-    .hero{
-      padding: 28px 26px 26px;
+    .page.active .panel{
+      opacity: 1;
+      transform: scale(1) translateY(0);
     }
+    .page.leaving .panel{
+      opacity: 0;
+      transform: scale(.94) translateY(-6px);
+      transition-duration: 360ms;
+    }
+
+    .hero{
+      padding: 32px 28px 30px;
+      text-align: center;
+    }
+
     .kicker{
       display:inline-flex;
       align-items:center;
+      justify-content: center;
       gap:10px;
-      padding: 9px 12px;
+      padding: 10px 14px;
       border-radius: 999px;
       border: 1px solid rgba(255,255,255,.14);
       background: rgba(0,0,0,.18);
       color: var(--muted);
-      font-weight: 700;
-      font-size: 12px;
+      font-weight: 900;
+      font-size: 14px;
+      letter-spacing: .2px;
     }
-    .dot{
-      width: 8px; height:8px; border-radius: 999px;
-      background: conic-gradient(from 210deg, var(--a), var(--b), var(--c), var(--d), var(--a));
-      box-shadow: 0 0 0 6px rgba(124,92,255,.10);
+    .trophy{
+      width: 18px;
+      height: 18px;
+      display:block;
+      filter: drop-shadow(0 12px 26px rgba(0,0,0,.35));
     }
+
     .title{
-      margin: 14px 0 10px;
-      font-size: clamp(28px, 3.4vw, 44px);
-      line-height: 1.05;
-      letter-spacing: -0.5px;
+      margin: 16px 0 12px;
+      font-size: clamp(30px, 3.8vw, 54px);
+      line-height: 1.03;
+      letter-spacing: -0.7px;
       font-weight: 900;
     }
     .subtitle{
-      margin: 0 0 18px;
+      margin: 0 auto 10px;
       color: var(--muted);
-      font-size: 14px;
-      line-height: 1.55;
+      font-size: 15px;
+      line-height: 1.6;
+      max-width: 90ch;
     }
 
-    .meta{
+    .introActions{
+      display:flex;
+      gap: 12px;
+      justify-content:center;
+      margin-top: 16px;
+      flex-wrap: wrap;
+    }
+    .pill{
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.06);
+      color: rgba(255,255,255,.86);
+      border-radius: 999px;
+      padding: 10px 14px;
+      font-weight: 900;
+      font-size: 12px;
+      display:inline-flex;
+      gap: 10px;
+      align-items: center;
+      cursor: pointer;
+      transition: transform .14s ease, background .14s ease, border-color .14s ease, box-shadow .14s ease;
+      user-select:none;
+    }
+    .pill:hover{
+      transform: translateY(-1px);
+      background: rgba(255,255,255,.09);
+      border-color: rgba(255,255,255,.20);
+      box-shadow: 0 10px 28px rgba(0,0,0,.30);
+    }
+
+    .nomineesBlock{
+      margin-top: 22px;
+      padding-top: 18px;
+      border-top: 1px solid rgba(255,255,255,.10);
+    }
+        .nomineesFlow{
       display:flex;
       flex-wrap: wrap;
-      gap: 10px;
-      margin-top: 12px;
+      gap: 18px;
+      align-items: flex-start;
+      justify-content: center;
+      padding-bottom: 4px;
     }
-    .chip{
-      display:inline-flex;
-      align-items:center;
-      gap:8px;
-      padding: 10px 12px;
-      border-radius: 14px;
-      border: 1px solid rgba(255,255,255,.12);
-      background: rgba(255,255,255,.06);
-      color: var(--muted);
-      font-size: 12px;
-      font-weight: 700;
-    }
-    .chip b{ color: var(--text); font-weight: 900; }
 
-    .nomBox{
-      padding: 20px;
+    .nominee{
+      width: 264px;
       display:flex;
       flex-direction: column;
-      gap: 12px;
-    }
-
-    .nomHeader{
-      display:flex;
-      justify-content: space-between;
-      align-items:flex-start;
-      gap: 10px;
-    }
-    .nomHeader h2{
-      margin:0;
-      font-size: 18px;
-      font-weight: 900;
-      letter-spacing: .2px;
-      line-height: 1.15;
-    }
-    .nomHeader p{
-      margin:6px 0 0;
-      color: var(--muted);
-      font-size: 13px;
-      line-height: 1.45;
-      max-width: 55ch;
-    }
-
-    .badge{
-      padding: 10px 12px;
-      border-radius: 999px;
-      font-weight: 900;
-      font-size: 12px;
-      border: 1px solid rgba(255,255,255,.16);
-      background: linear-gradient(90deg, rgba(124,92,255,.22), rgba(0,212,255,.18));
-      white-space: nowrap;
-      box-shadow: 0 12px 50px rgba(0,0,0,.35);
-    }
-
-    .grid{
-      display:grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 12px;
-      margin-top: 8px;
-    }
-    @media (max-width: 560px){
-      .grid{ grid-template-columns: 1fr; }
-    }
-
-    .card{
-      border-radius: 18px;
-      border: 1px solid rgba(255,255,255,.12);
-      background: rgba(255,255,255,.06);
-      padding: 12px;
-      display:flex;
-      gap: 12px;
       align-items: center;
-      transition: transform .16s ease, background .16s ease, border-color .16s ease;
-      position: relative;
-      overflow:hidden;
-    }
-    .card::before{
-      content:"";
-      position:absolute;
-      inset:-1px;
-      background: radial-gradient(240px 160px at 10% 20%, rgba(255,255,255,.12), transparent 60%),
-                  radial-gradient(240px 160px at 90% 40%, rgba(124,92,255,.10), transparent 60%);
+      gap: 12px;
+      padding: 16px 14px 16px;
+      border-radius: 22px;
+      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.05);
+      transition: transform .18s ease, background .18s ease, border-color .18s ease;
+      will-change: transform, opacity;
+      transform: scale(.78);
       opacity: 0;
-      transition: opacity .16s ease;
-      pointer-events:none;
     }
-    .card:hover{
-      transform: translateY(-2px);
-      background: rgba(255,255,255,.08);
+    .nominee:hover{
+      transform: scale(1.02) translateY(-2px);
+      background: rgba(255,255,255,.075);
       border-color: rgba(255,255,255,.18);
     }
-    .card:hover::before{ opacity: 1; }
 
-    .ava{
-      width: 44px; height: 44px;
-      border-radius: 14px;
-      flex: 0 0 auto;
+    .nomineeAva{
+      width: 184px;
+      height: 184px;
+      border-radius: 44px;
       overflow:hidden;
       border: 1px solid rgba(255,255,255,.16);
       background: rgba(255,255,255,.06);
+      box-shadow: 0 22px 70px rgba(0,0,0,.38);
     }
-    .ava img{
-      width: 100%;
-      height: 100%;
+    .nomineeAva img{
+      width:100%;
+      height:100%;
       object-fit: cover;
       display:block;
     }
-    .who{
-      min-width: 0;
-      display:flex;
-      flex-direction: column;
-      gap: 2px;
-    }
-    .nick{
+
+    .nomineeName{
       font-weight: 900;
-      font-size: 13px;
-      letter-spacing: .1px;
+      font-size: 16px;
+      text-align: center;
+      max-width: 240px;
       white-space: nowrap;
-      overflow:hidden;
+      overflow: hidden;
       text-overflow: ellipsis;
     }
-    .tag{
+    .nomineeTag{
+      font-weight: 900;
+      font-size: 14px;
       color: var(--muted2);
-      font-weight: 700;
-      font-size: 12px;
+      text-align: center;
+      max-width: 240px;
       white-space: nowrap;
-      overflow:hidden;
+      overflow: hidden;
       text-overflow: ellipsis;
+      margin-top: -8px;
     }
 
-    .footerHint{
-      position: fixed;
-      bottom: 14px;
-      left: 50%;
-      transform: translateX(-50%);
-      display:flex;
-      align-items:center;
-      gap: 10px;
-      z-index: 60;
-      padding: 10px 14px;
-      border-radius: 999px;
-      border: 1px solid rgba(255,255,255,.12);
-      background: rgba(0,0,0,.22);
-      backdrop-filter: blur(14px);
-      color: var(--muted);
-      font-size: 12px;
-      font-weight: 800;
-      user-select:none;
+    @keyframes nomineeIn {
+      0%   { transform: scale(.74) translateY(10px); opacity: 0; filter: blur(2px); }
+      60%  { transform: scale(1.08) translateY(0); opacity: 1; filter: blur(0); }
+      100% { transform: scale(1) translateY(0); opacity: 1; filter: blur(0); }
     }
+    @keyframes nomineeOut {
+      0%   { transform: scale(1) translateY(0); opacity: 1; }
+      100% { transform: scale(.86) translateY(-4px); opacity: 0; }
+    }
+
+    .page.active .nominee{
+      animation: nomineeIn 520ms cubic-bezier(.2,.9,.2,1) both;
+      animation-delay: calc(var(--i, 0) * 70ms);
+    }
+    .page.leaving .nominee{
+      animation: nomineeOut 220ms ease both;
+      animation-delay: calc(var(--i, 0) * 30ms);
+    }
+
+    @media (max-width: 680px){
+      .hero{ padding: 26px 18px 22px; }
+      .nominee{ width: 46%; min-width: 170px; }
+      .nomineeAva{ width: 140px; height: 140px; border-radius: 36px; }
+      .nomineeName{ font-size: 14px; }
+      .nomineeTag{ font-size: 12px; }
+    }
+
     .arrow{
       width: 10px; height: 10px;
       border-right: 2px solid rgba(255,255,255,.55);
       border-bottom: 2px solid rgba(255,255,255,.55);
       transform: rotate(45deg);
-      animation: bounce 1.25s ease-in-out infinite;
       margin-left: 2px;
     }
-    @keyframes bounce{
-      0%,100%{ transform: translateY(0) rotate(45deg); opacity: .85; }
-      50%{ transform: translateY(4px) rotate(45deg); opacity: .55; }
+
+    .bottomNext{
+      position: fixed;
+      bottom: 14px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 60;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap: 10px;
+      padding: 12px 16px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(0,0,0,.22);
+      backdrop-filter: blur(14px);
+      box-shadow: 0 10px 38px rgba(0,0,0,.35);
+      color: rgba(255,255,255,.86);
+      font-size: 12px;
+      font-weight: 900;
+      cursor:pointer;
+      user-select:none;
+      transition: transform .14s ease, background .14s ease, border-color .14s ease, box-shadow .14s ease, opacity .18s ease;
+    }
+    .bottomNext:hover{
+      transform: translateX(-50%) translateY(-1px);
+      background: rgba(255,255,255,.08);
+      border-color: rgba(255,255,255,.20);
+      box-shadow: 0 18px 55px rgba(0,0,0,.42);
+    }
+    .bottomNext:active{ transform: translateX(-50%) translateY(0px); }
+  
+
+    /* Video nominees */
+    .nominee.isVideo{
+      cursor: pointer;
+      position: relative;
+    }
+    .nominee.isVideo::after{
+      content:"";
+      position:absolute;
+      inset: 0;
+      border-radius: 22px;
+      background: radial-gradient(420px 240px at 50% 30%, rgba(0,212,255,.12), transparent 60%),
+                  radial-gradient(420px 240px at 30% 80%, rgba(255,79,216,.10), transparent 60%);
+      pointer-events:none;
+      opacity:.9;
+    }
+    .playBadge{
+      position:absolute;
+      width: 54px;
+      height: 54px;
+      border-radius: 999px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      background: rgba(0,0,0,.34);
+      border: 1px solid rgba(255,255,255,.18);
+      box-shadow: 0 18px 50px rgba(0,0,0,.45);
+      inset: auto auto 18px 18px;
+      z-index: 3;
+      backdrop-filter: blur(10px);
+    }
+    .playBadge svg{ width: 18px; height: 18px; opacity: .92; }
+
+    /* Video modal */
+    .vmodal{
+      position: fixed;
+      inset: 0;
+      z-index: 80;
+      display: none;
+    }
+    .vmodal.open{ display: block; }
+    .vmodal__backdrop{
+      position:absolute;
+      inset:0;
+      background: rgba(0,0,0,.58);
+      backdrop-filter: blur(10px);
+    }
+    .vmodal__dialog{
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      width: min(980px, calc(100vw - 32px));
+      border-radius: 22px;
+      background: rgba(8,10,18,.74);
+      border: 1px solid rgba(255,255,255,.14);
+      box-shadow: 0 24px 90px rgba(0,0,0,.60);
+      overflow: hidden;
+    }
+    .vmodal__content{
+      padding: 16px 16px 18px;
+    }
+    .vmodal__title{
+      font-weight: 900;
+      font-size: 14px;
+      color: rgba(255,255,255,.9);
+      margin: 0 0 10px;
+      text-align: center;
+    }
+    .vmodal__video{
+      width: 100%;
+      max-height: var(--mediaMaxH);
+      border-radius: 16px;
+      background: rgba(0,0,0,.35);
+      outline: none;
+    }
+    .vmodal__close{
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      width: 40px;
+      height: 40px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.16);
+      background: rgba(255,255,255,.06);
+      color: rgba(255,255,255,.92);
+      font-weight: 900;
+      cursor: pointer;
+      z-index: 2;
+      transition: transform .14s ease, background .14s ease, border-color .14s ease;
+    }
+    .vmodal__close:hover{
+      transform: translateY(-1px);
+      background: rgba(255,255,255,.10);
+      border-color: rgba(255,255,255,.24);
     }
 
-    /* appear animation */
-    .reveal{
+  
+    /* Adaptive media height (computed per nomination) */
+    .page{ --mediaMaxH: 360px; }
+
+    .nomineeCustom img{
+      display:block;
+      width: auto;
+      max-width: min(860px, 92vw);
+      max-height: min(var(--mediaMaxH), 52vh);
+      height: auto;
+      object-fit: contain;
+      border-radius: 22px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.04);
+      box-shadow: 0 22px 70px rgba(0,0,0,.40);
+    }
+
+
+    /* Media nominees (custom/video) - not Discord cards */
+    .nomineeMedia{
+      width: 100%;
+      display:flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 14px;
+      transform: scale(.90);
       opacity: 0;
-      transform: translateY(10px);
-      transition: opacity .35s ease, transform .35s ease;
+      will-change: transform, opacity;
     }
-    .reveal.on{
-      opacity: 1;
-      transform: translateY(0);
+    .page.active .nomineeMedia{
+      animation: nomineeIn 520ms cubic-bezier(.2,.9,.2,1) both;
+      animation-delay: calc(var(--i, 0) * 70ms);
     }
+    .page.leaving .nomineeMedia{
+      animation: nomineeOut 220ms ease both;
+      animation-delay: calc(var(--i, 0) * 30ms);
+    }
+
+    .mediaTitle{
+      font-weight: 900;
+      font-size: 18px;
+      letter-spacing: .2px;
+      color: rgba(255,255,255,.92);
+      text-align: center;
+      margin: 0;
+      text-shadow: 0 14px 40px rgba(0,0,0,.55);
+    }
+
+    .customTitleOnly{
+      max-width: min(860px, 92vw);
+      padding: 26px 26px;
+      border-radius: 18px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.05);
+      box-shadow: 0 22px 70px rgba(0,0,0,.30);
+      text-align: center;
+      line-height: 1.12;
+      font-weight: 900;
+      font-size: clamp(22px, 3.2vw, 36px);
+    }
+
+    /* Video thumb (embedded) */
+    .videoThumb{
+      width: min(860px, 92vw, calc(var(--mediaMaxH) * 16 / 9));
+      border-radius: 22px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: #000;
+      box-shadow: 0 22px 70px rgba(0,0,0,.40);
+      overflow: hidden;
+      position: relative;
+      cursor: pointer;
+    }
+    .videoThumb .poster{
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      max-height: var(--mediaMaxH);
+      display:block;
+      object-fit: cover;
+      filter: saturate(1.05) contrast(1.03);
+    }
+    .videoThumb .posterPlaceholder{
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      max-height: var(--mediaMaxH);
+      display:block;
+      background: radial-gradient(900px 420px at 50% 30%, rgba(255,255,255,.06), transparent 60%),
+                  linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,0));
+    }
+    .videoThumb .play{
+      position:absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      width: 76px;
+      height: 76px;
+      border-radius: 999px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      background: rgba(0,0,0,.34);
+      border: 1px solid rgba(255,255,255,.18);
+      box-shadow: 0 18px 50px rgba(0,0,0,.45);
+      backdrop-filter: blur(10px);
+      transition: transform .14s ease, background .14s ease, border-color .14s ease;
+      pointer-events:none;
+    }
+    .videoThumb:hover .play{
+      transform: translate(-50%, -50%) scale(1.04);
+      background: rgba(0,0,0,.42);
+      border-color: rgba(255,255,255,.26);
+    }
+    .videoThumb .play svg{ width: 22px; height: 22px; opacity: .92; }
+
+    @media (max-width: 680px){
+      .mediaTitle{ font-size: 16px; }
+      .customTitleOnly{ font-size: clamp(20px, 6vw, 28px); padding: 22px 22px; }
+      .videoThumb .play{ width: 66px; height: 66px; }
+    }
+
+  
+    /* Nomination card sizing: fixed aspect ratio that always fits the viewport */
+    .nomPanel{
+      --availH: calc(100vh - var(--topOffset) - 150px);
+      height: min(var(--availH), 820px);
+      width: min(1200px, calc(100vw - 36px), calc(min(var(--availH), 820px) * 16 / 10));
+      aspect-ratio: 16 / 10;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+    }
+
+    /* Use the whole card area (no inner scroll); content stretches nicely */
+    .nomPanel .nomineesBlock{
+      margin-top: 12px;
+      padding: 18px 18px;
+      border-top: 1px solid rgba(255,255,255,.10);
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden; /* no inner scroll */
+    }
+    .nomPanel .nomineesFlow{
+      width: 100%;
+      justify-content: center;
+      align-items: center;
+      align-content: center;
+      padding: 8px 0;
+
+    }
+
+    /* On narrow/tall screens, slightly taller ratio */
+    @media (max-aspect-ratio: 4/5){
+      .nomPanel{
+        aspect-ratio: 9 / 16;
+        width: min(900px, calc(100vw - 36px), calc(min(var(--availH), 820px) * 9 / 16));
+      }
+    }
+
+    /* Preface styling */
+    .introPanel{
+      padding: 44px 28px 36px;
+    }
+    .prefaceBrand{
+      display:flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+    .prefaceIcon{
+      width: 118px;
+      height: 118px;
+      border-radius: 34px;
+      overflow:hidden;
+      border: 1px solid rgba(255,255,255,.16);
+      background: rgba(255,255,255,.06);
+      box-shadow: 0 22px 80px rgba(0,0,0,.45);
+      position: relative;
+    }
+    .prefaceIcon::before{
+      content:"";
+      position:absolute;
+      inset:-2px;
+      border-radius: 36px;
+      background: conic-gradient(from 220deg, rgba(124,92,255,.55), rgba(0,212,255,.45), rgba(255,79,216,.38), rgba(255,184,0,.35), rgba(124,92,255,.55));
+      filter: blur(14px);
+      opacity: .55;
+      z-index: 0;
+    }
+    .prefaceIcon img{
+      width:100%;
+      height:100%;
+      object-fit: cover;
+      display:block;
+      position: relative;
+      z-index: 1;
+    }
+    .prefaceKicker{
+      display:inline-flex;
+      align-items:center;
+      justify-content: center;
+      gap:10px;
+      padding: 10px 14px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(0,0,0,.18);
+      color: var(--muted);
+      font-weight: 900;
+      font-size: 14px;
+      letter-spacing: .2px;
+    }
+
+    /* Gentle reveal when leaving preface -> nominations */
+    .page.reveal .panel{
+      animation: revealIn 760ms cubic-bezier(.18,.9,.18,1) both;
+    }
+    @keyframes revealIn{
+      0%{ opacity: 0; transform: scale(.94) translateY(18px); filter: blur(2px); }
+      60%{ opacity: 1; transform: scale(1.02) translateY(0); filter: blur(0); }
+      100%{ opacity: 1; transform: scale(1) translateY(0); filter: blur(0); }
+    }
+
+  
+    /* Stabilize nomination transitions (avoid ghosting + resizing during leave) */
+    .page{ position: relative; }
+    .page.leaving{ pointer-events: none; }
+    .page:not(.active):not(.leaving) .panel{
+      opacity: 0;
+      transform: scale(.94) translateY(12px);
+      pointer-events: none;
+    }
+
+  
+    .page.preparing .panel{
+      transition: none !important;
+      opacity: 0 !important;
+      transform: scale(.965) translateY(10px) !important;
+    }
+    .page.preparing .nominee,
+    .page.preparing .nomineeMedia{
+      animation: none !important;
+      opacity: 0 !important;
+      transform: scale(.78) translateY(10px) !important;
+    }
+
   </style>
 </head>
 
 <body>
-  <div class="topbar">
-    <div class="brand">
-      <div class="logo" aria-hidden="true">
-        <img src="./icon-192.png" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:12px;">
+  <canvas id="fx"></canvas>
+
+  <div class="topbar" id="topbar">
+    <div></div>
+
+    <div class="brandCenter" aria-label="Zeart Awards 2025">
+      <div class="brandIcon" aria-hidden="true">
+        <img src="./icon-192.png" alt="">
       </div>
-      <div>
-        <h1>Zeart Awards 2025</h1>
-        <span id="subtitleTop">Годовые номинации сервера</span>
+      <div class="brandText">
+        <h1 id="siteTitleTop">Zeart Awards 2025</h1>
+        <span id="subtitleTop">Годовые номинации участников Zeart</span>
       </div>
     </div>
 
-    <div class="nav" id="nav"></div>
-
-    <div class="right">
-      <div class="mini">
-        <b id="progressText">0 / 0</b>
-        <i>номинаций</i>
+    <div class="navWrap">
+      <div class="dropdown" id="dropdown">
+        <button class="ddBtn" id="ddBtn" type="button" aria-haspopup="listbox" aria-expanded="false" title="Выбрать номинацию">
+          <span class="ddLabel" id="ddLabel">Номинации</span>
+          <span class="chev" aria-hidden="true"></span>
+        </button>
+        <div class="menu" id="menu" role="listbox" tabindex="-1" aria-label="Список номинаций"></div>
       </div>
-      <button class="btn" id="nextBtn" title="Следующая номинация">
-        Далее <span class="arrow" style="animation:none; margin:0; transform: rotate(45deg)"></span>
-      </button>
     </div>
   </div>
 
   <div class="pages" id="pages"></div>
 
-  <div class="footerHint" id="hint">
-    Скролль вниз <span class="arrow"></span>
+  <button class="bottomNext" id="nextBtn" title="Следующая страница">
+    Далее <span class="arrow"></span>
+  </button>
+
+
+  <!-- Video Modal -->
+  <div class="vmodal" id="vmodal" aria-hidden="true">
+    <div class="vmodal__backdrop" id="vmodalBackdrop"></div>
+    <div class="vmodal__dialog" role="dialog" aria-modal="true" aria-label="Просмотр видео">
+      <button class="vmodal__close" id="vmodalClose" type="button" aria-label="Закрыть">✕</button>
+      <div class="vmodal__content">
+        <div class="vmodal__title" id="vmodalTitle"></div>
+        <video class="vmodal__video" id="vmodalVideo" controls playsinline></video>
+      </div>
+    </div>
   </div>
 
+
   <script>
-    const DEFAULT_CONFIG = {
+  const DEFAULT_CONFIG = {
       siteTitle: "Zeart Awards 2025",
-      siteSubtitle: "Годовые номинации участников Discord сервера",
+      siteSubtitle: "Годовые номинации участников Zeart",
+      prefaceTitle: "Добро пожаловать на Zeart Awards 2025",
+      prefaceText: "Здесь собраны годовые номинации участников Zeart. Листай вниз и выбирай свою любимую номинацию — а мы устроим праздник при каждом открытии.",
+      afterwordTitle: "Спасибо, что были с Zeart!",
+      afterwordText: "Это был мощный год. Увидимся на следующих номинациях — и да начнётся новый сезон легенд ✨",
       nominations: [
         {
           id: "meme",
@@ -470,34 +1010,117 @@
           description: "Кто сделал год веселее всех — по версии легенд.",
           nominees: [
             { name: "Zeart", tag: "@zeart", avatarUrl: "https://cdn.discordapp.com/embed/avatars/0.png" },
-            { name: "Luna", tag: "@luna", avatarUrl: "https://cdn.discordapp.com/embed/avatars/1.png" },
-            { name: "Vlad", tag: "@vlad", avatarUrl: "https://cdn.discordapp.com/embed/avatars/2.png" },
-            { name: "Kira", tag: "@kira", avatarUrl: "https://cdn.discordapp.com/embed/avatars/3.png" },
+            { name: "Luna", tag: "@luna", avatarUrl: "https://cdn.discordapp.com/embed/avatars/1.png" }
           ]
         },
-        {
-          id: "helper",
-          title: "Помощник года",
-          description: "Всегда рядом, всегда в теме, всегда спасает.",
-          nominees: [
-            { name: "Nova", tag: "@nova", avatarUrl: "https://cdn.discordapp.com/embed/avatars/4.png" },
-            { name: "Rex", tag: "@rex", avatarUrl: "https://cdn.discordapp.com/embed/avatars/5.png" },
-          ]
-        }
+    {
+      id: "game",
+      title: "Игра года",
+      description: "Лучшая игра этого года",
+      nominees: [
+      {
+        type: "custom",
+        imageUrl: "assets/valorant.jpg",
+        title: "VALORANT"
+      }
       ]
-    };
+    },
+    {
+      id: "clip",
+      title: "Клип года",
+      description: "Лучший клип в этом году",
+      nominees: [
+      {
+        type: "video",
+        videoUrl: "assets/ytro1.mp4",
+        title: "Утро"
+      }
+      ]
+    },
+    {
+      id: "voice-channel",
+      title: "Голосовой канал года",
+      description: "Лучшая голосовой канал года",
+      nominees: [
+      {
+        type: "custom",
+        title: "Изотопия"
+      },
+      {
+        type: "custom",
+        title: "Гараж"
+      }
+      ]
+    }
+  ]};
 
     const pages = document.getElementById('pages');
-    const nav = document.getElementById('nav');
-    const progressText = document.getElementById('progressText');
     const nextBtn = document.getElementById('nextBtn');
+    const ddBtn = document.getElementById('ddBtn');
+    const ddLabel = document.getElementById('ddLabel');
+    const menu = document.getElementById('menu');
+    const dropdown = document.getElementById('dropdown');
+    const topbar = document.getElementById('topbar');
+
     const subtitleTop = document.getElementById('subtitleTop');
-    const hint = document.getElementById('hint');
+    const siteTitleTop = document.getElementById('siteTitleTop');
 
     let cfg = null;
     let sections = [];
-    let pills = [];
+    let menuItems = [];
     let currentIndex = 0;
+    let leaveTimer = null;
+    let prepToken = 0;
+
+    // ===== Video modal helpers =====
+    const vmodal = document.getElementById('vmodal');
+    const vmodalBackdrop = document.getElementById('vmodalBackdrop');
+    const vmodalClose = document.getElementById('vmodalClose');
+    const vmodalVideo = document.getElementById('vmodalVideo');
+    const vmodalTitle = document.getElementById('vmodalTitle');
+
+    function openVideoModal(url, title){
+      try{
+        vmodalTitle.textContent = title || "Видео";
+        vmodalVideo.pause();
+        vmodalVideo.removeAttribute('src');
+        vmodalVideo.load();
+        vmodalVideo.src = url;
+        vmodal.classList.add('open');
+        vmodal.setAttribute('aria-hidden','false');
+        // body is already overflow hidden; keep it
+        setTimeout(() => { try { vmodalVideo.play(); } catch {} }, 60);
+      }catch(e){}
+    }
+
+    function closeVideoModal(){
+      vmodal.classList.remove('open');
+      vmodal.setAttribute('aria-hidden','true');
+      try{
+        vmodalVideo.pause();
+        vmodalVideo.removeAttribute('src');
+        vmodalVideo.load();
+      }catch(e){}
+    }
+
+    vmodalBackdrop.addEventListener('click', closeVideoModal);
+    vmodalClose.addEventListener('click', closeVideoModal);
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && vmodal.classList.contains('open')) closeVideoModal();
+    });
+
+    function el(tag, cls, html){
+      const x = document.createElement(tag);
+      if (cls) x.className = cls;
+      if (html !== undefined) x.innerHTML = html;
+      return x;
+    }
+
+    function escapeHtml(s){
+      return String(s ?? "").replace(/[&<>"']/g, (m) => ({
+        "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
+      }[m]));
+    }
 
     async function loadConfig() {
       try {
@@ -509,151 +1132,752 @@
       }
     }
 
-    function el(tag, cls, html){
-      const x = document.createElement(tag);
-      if (cls) x.className = cls;
-      if (html !== undefined) x.innerHTML = html;
-      return x;
-    }
+    const TROPHY_SVG = `
+      <svg class="trophy" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path d="M7 4h10v3a5 5 0 0 1-10 0V4Z" stroke="rgba(255,255,255,.90)" stroke-width="1.9" stroke-linejoin="round"/>
+        <path d="M7 7H4.5A1.5 1.5 0 0 0 3 8.5v.5A4 4 0 0 0 7 13" stroke="rgba(255,255,255,.70)" stroke-width="1.9" stroke-linecap="round"/>
+        <path d="M17 7h2.5A1.5 1.5 0 0 1 21 8.5v.5a4 4 0 0 1-4 4" stroke="rgba(255,255,255,.70)" stroke-width="1.9" stroke-linecap="round"/>
+        <path d="M12 12v4" stroke="rgba(255,255,255,.82)" stroke-width="1.9" stroke-linecap="round"/>
+        <path d="M8.5 20h7" stroke="rgba(255,255,255,.82)" stroke-width="1.9" stroke-linecap="round"/>
+        <path d="M9.5 16h5" stroke="rgba(255,255,255,.82)" stroke-width="1.9" stroke-linecap="round"/>
+      </svg>
+    `;
 
-    function render() {
-      document.title = cfg.siteTitle || "Zeart Awards 2025";
-      subtitleTop.textContent = cfg.siteSubtitle || "Годовые номинации";
+    const TROPHY_MINI_SVG = `
+      <svg style="width:14px;height:14px;flex:0 0 auto;opacity:.9;filter:drop-shadow(0 8px 18px rgba(0,0,0,.35))" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path d="M7 4h10v3a5 5 0 0 1-10 0V4Z" stroke="rgba(255,255,255,.92)" stroke-width="1.8" stroke-linejoin="round"/>
+        <path d="M7 7H4.5A1.5 1.5 0 0 0 3 8.5v.5A4 4 0 0 0 7 13" stroke="rgba(255,255,255,.72)" stroke-width="1.8" stroke-linecap="round"/>
+        <path d="M17 7h2.5A1.5 1.5 0 0 1 21 8.5v.5a4 4 0 0 1-4 4" stroke="rgba(255,255,255,.72)" stroke-width="1.8" stroke-linecap="round"/>
+        <path d="M12 12v4" stroke="rgba(255,255,255,.84)" stroke-width="1.8" stroke-linecap="round"/>
+        <path d="M8.5 20h7" stroke="rgba(255,255,255,.84)" stroke-width="1.8" stroke-linecap="round"/>
+        <path d="M9.5 16h5" stroke="rgba(255,255,255,.84)" stroke-width="1.8" stroke-linecap="round"/>
+      </svg>
+    `;
 
-      pages.innerHTML = '';
-      nav.innerHTML = '';
-      sections = [];
-      pills = [];
-      currentIndex = 0;
 
-      const nominations = Array.isArray(cfg.nominations) ? cfg.nominations : [];
+    
+    function updateMediaMaxH(pageEl){
+      // Compute available height for embedded media inside nomination panel so it never gets clipped.
+      const vh = window.innerHeight || 800;
+      const top = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--topOffset')) || 0;
 
-      progressText.textContent = `1 / ${Math.max(1, nominations.length)}`;
+      const pagesToUpdate = pageEl ? [pageEl] : [sections[currentIndex]].filter(Boolean);
 
-      nominations.forEach((nom, idx) => {
-        const pill = el('div', 'pill', nom.shortTitle || nom.title || `Номинация ${idx+1}`);
-        pill.addEventListener('click', () => scrollToIndex(idx));
-        nav.appendChild(pill);
-        pills.push(pill);
+      pagesToUpdate.forEach(page => {
+        if (!page || page.dataset.kind !== 'nomination') return;
 
-        const page = el('section', 'page');
-        page.dataset.index = String(idx);
+        const panel = page.querySelector('.panel');
+        const hero = page.querySelector('.hero');
+        const nomineesBlock = page.querySelector('.nomineesBlock');
+        if (!panel || !hero || !nomineesBlock) return;
 
-        const wrap = el('div', 'wrap');
+        const bottomReserve = 118; // room for bottom button + safe area
+        const heroH = hero.getBoundingClientRect().height;
 
-        // Left: hero-ish panel
-        const left = el('div', 'panel hero reveal');
-        const kicker = el('div', 'kicker', `<span class="dot" aria-hidden="true"></span> Zeart Awards • 2025`);
-        const title = el('div', 'title', nom.title || `Номинация ${idx+1}`);
-        const subtitle = el('div', 'subtitle', nom.description || '—');
+        const nbStyles = getComputedStyle(nomineesBlock);
+        const nbPad = (parseFloat(nbStyles.paddingTop)||0) + (parseFloat(nbStyles.paddingBottom)||0);
+        const nbBorder = (parseFloat(nbStyles.borderTopWidth)||0);
 
-        const meta = el('div', 'meta');
-        const nCount = Array.isArray(nom.nominees) ? nom.nominees.length : 0;
-        meta.appendChild(el('div', 'chip', `Номинантов: <b>${nCount}</b>`));
-        meta.appendChild(el('div', 'chip', `Позиция: <b>${idx+1}</b> / <b>${nominations.length}</b>`));
-
-        left.appendChild(kicker);
-        left.appendChild(title);
-        left.appendChild(subtitle);
-        left.appendChild(meta);
-
-        // Right: nominees panel
-        const right = el('div', 'panel nomBox reveal');
-
-        const header = el('div', 'nomHeader');
-        const h = el('div');
-        h.appendChild(el('h2', '', 'Номинанты'));
-        h.appendChild(el('p', '', 'Аватар и ник берутся из config.json (его можно сгенерировать из Discord скриптом).'));
-        header.appendChild(h);
-        header.appendChild(el('div', 'badge', `#${idx+1}`));
-
-        const grid = el('div', 'grid');
-
-        (nom.nominees || []).forEach((p) => {
-          const card = el('div', 'card');
-          const ava = el('div', 'ava');
-          const img = document.createElement('img');
-          img.loading = "lazy";
-          img.alt = p.name || "nominee";
-          img.src = p.avatarUrl || "https://cdn.discordapp.com/embed/avatars/0.png";
-          ava.appendChild(img);
-
-          const who = el('div', 'who');
-          who.appendChild(el('div', 'nick', escapeHtml(p.name || "Unknown")));
-          who.appendChild(el('div', 'tag', escapeHtml(p.tag || "")));
-
-          card.appendChild(ava);
-          card.appendChild(who);
-          grid.appendChild(card);
-        });
-
-        right.appendChild(header);
-        right.appendChild(grid);
-
-        wrap.appendChild(left);
-        wrap.appendChild(right);
-
-        page.appendChild(wrap);
-        pages.appendChild(page);
-        sections.push(page);
+        // A bit of extra breathing room
+        const maxH = Math.max(220, Math.floor(vh - top - bottomReserve - heroH - nbPad - nbBorder - 26));
+        page.style.setProperty('--mediaMaxH', maxH + 'px');
       });
-
-      // активируем pill 0
-      setActive(0);
-
-      // observer для reveal-анимаций
-      const io = new IntersectionObserver((entries) => {
-        for (const e of entries){
-          if (e.isIntersecting) e.target.classList.add('on');
-        }
-      }, { threshold: 0.15 });
-
-      document.querySelectorAll('.reveal').forEach(n => io.observe(n));
     }
 
-    function escapeHtml(s){
-      return String(s).replace(/[&<>"']/g, (m) => ({
-        "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
-      }[m]));
-    }
 
-    function setActive(i){
-      currentIndex = Math.max(0, Math.min(i, sections.length - 1));
-      pills.forEach((p, idx) => p.classList.toggle('active', idx === currentIndex));
-      progressText.textContent = `${currentIndex + 1} / ${sections.length}`;
-      hint.style.opacity = currentIndex >= sections.length - 1 ? 0 : 1;
+function scheduleMediaMeasure(reason){ /* deprecated: kept for compatibility */ }
+
+function computeTopOffset(){
+      if (topbar.classList.contains('isHidden')){
+        document.documentElement.style.setProperty('--topOffset', '0px');
+        return;
+      }
+      const r = topbar.getBoundingClientRect();
+      const offset = Math.round(r.bottom + 14);
+      document.documentElement.style.setProperty('--topOffset', offset + 'px');
     }
 
     function scrollToIndex(i){
       const s = sections[i];
       if (!s) return;
       s.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      setActive(i);
     }
 
-    function findClosestIndex(){
-      // ищем секцию, чей top ближе к верху контейнера
-      const containerTop = pages.getBoundingClientRect().top;
-      let best = 0;
-      let bestDist = Infinity;
+    function render() {
+      document.title = cfg.siteTitle || "Zeart Awards 2025";
+      siteTitleTop.textContent = cfg.siteTitle || "Zeart Awards 2025";
+      subtitleTop.textContent = cfg.siteSubtitle || "Годовые номинации участников Zeart";
+
+      pages.innerHTML = '';
+
+      // Spacer to prevent header overlap on the very first snap
+      const topSpacer = document.createElement('div');
+      topSpacer.className = 'topSpacer';
+      pages.appendChild(topSpacer);
+      menu.innerHTML = '';
+      sections = [];
+      menuItems = [];
+      currentIndex = 0;
+
+      const nominations = Array.isArray(cfg.nominations) ? cfg.nominations : [];
+      const nomCount = nominations.length;
+
+      // Intro
+      const intro = el('section', 'page');
+      intro.dataset.index = '0';
+      intro.dataset.kind = 'intro';
+      const introWrap = el('div', 'wrap');
+      const introPanel = el('div', 'panel hero introPanel');
+            const brand = el('div', 'prefaceBrand');
+      const icon = el('div', 'prefaceIcon');
+      const im = document.createElement('img');
+      im.src = './icon-192.png';
+      im.alt = cfg.siteTitle || 'Zeart Awards 2025';
+      icon.appendChild(im);
+      brand.appendChild(icon);
+      brand.appendChild(el('div', 'prefaceKicker', `${TROPHY_SVG} ${escapeHtml(cfg.siteTitle || 'Zeart Awards 2025')}`));
+      introPanel.appendChild(brand);
+      introPanel.appendChild(el('div', 'title', escapeHtml(cfg.prefaceTitle || 'Добро пожаловать')));
+      introPanel.appendChild(el('div', 'subtitle', escapeHtml(cfg.prefaceText || 'Листай вниз, чтобы начать.')));
+const act = el('div', 'introActions');
+      const goBtn = el('div', 'pill', `Начать <span class="arrow" style="animation:none; margin:0; transform: rotate(45deg)"></span>`);
+      goBtn.addEventListener('click', () => {
+        if (nomCount > 0) scrollToIndex(1);
+        else scrollToIndex(sections.length - 1);
+      });
+      act.appendChild(goBtn);
+      introPanel.appendChild(act);
+
+      introWrap.appendChild(introPanel);
+      intro.appendChild(introWrap);
+      pages.appendChild(intro);
+      sections.push(intro);
+
+      // Nominations + dropdown items
+      nominations.forEach((nom, idx) => {
+        const sectionIndex = idx + 1;
+
+        const item = document.createElement('button');
+        item.type = "button";
+        item.className = "menuItem";
+        item.setAttribute("role", "option");
+        item.dataset.sectionIndex = String(sectionIndex);
+        item.dataset.nomIndex = String(idx);
+        item.innerHTML = `${TROPHY_MINI_SVG}<span style="min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${escapeHtml(nom.title || `Номинация ${idx+1}`)}</span>`;
+        item.addEventListener('click', () => {
+          closeMenu();
+          scrollToIndex(sectionIndex);
+        });
+        menu.appendChild(item);
+        menuItems.push(item);
+
+        const page = el('section', 'page');
+        page.dataset.index = String(sectionIndex);
+        page.dataset.kind = 'nomination';
+
+        const wrap = el('div', 'wrap');
+        const panel = el('div', 'panel hero nomPanel');
+
+        panel.appendChild(el('div', 'title', escapeHtml(nom.title || `Номинация ${idx+1}`)));
+        panel.appendChild(el('div', 'subtitle', escapeHtml(nom.description || '—')));
+
+        const nomineesBlock = el('div', 'nomineesBlock');
+        const flow = el('div', 'nomineesFlow');
+
+        (nom.nominees || []).forEach((p, i) => {
+          const type = (p && p.type ? String(p.type) : "discord").toLowerCase();
+
+          // ----- VIDEO (embedded thumb -> modal player) -----
+          if (type === "video") {
+            const url = String(p?.videoUrl || "").trim();
+            const title = String(p?.title || p?.name || "Видео").trim();
+
+            const box = el('div', 'nomineeMedia nomineeVideo');
+            box.style.setProperty('--i', i);
+
+            if (title) box.appendChild(el('div', 'mediaTitle', escapeHtml(title)));
+
+            const thumb = el('div', 'videoThumb');
+            if (p?.posterUrl) {
+              const img = document.createElement('img');
+              img.className = 'poster';
+              img.loading = 'lazy';
+              img.decoding = 'async';
+              img.alt = title || 'Video';
+              img.src = p.posterUrl;
+              thumb.appendChild(img);
+            } else {
+              const ph = el('div', 'posterPlaceholder');
+              thumb.appendChild(ph);
+            }
+
+            const play = document.createElement('div');
+            play.className = 'play';
+            play.innerHTML = `
+              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="M9.5 7.5v9l8-4.5-8-4.5Z" fill="rgba(255,255,255,.92)"/>
+              </svg>
+            `;
+            thumb.appendChild(play);
+
+            if (url) {
+              thumb.addEventListener('click', () => openVideoModal(url, title));
+            } else {
+              thumb.style.cursor = 'default';
+              thumb.style.opacity = '.6';
+            }
+
+            box.appendChild(thumb);
+            flow.appendChild(box);
+            return;
+          }
+
+          // ----- CUSTOM (title + optional image, no Discord card) -----
+          if (type === "custom") {
+            const imageUrl = String(p?.imageUrl || p?.path || p?.src || p?.url || "").trim();
+            const title = String(p?.title || p?.name || "").trim();
+
+            const box = el('div', 'nomineeMedia nomineeCustom');
+            box.style.setProperty('--i', i);
+
+            // If no image -> just title block inside nomination card
+            if (!imageUrl) {
+              if (title) {
+                box.appendChild(el('div', 'customTitleOnly', escapeHtml(title)));
+                flow.appendChild(box);
+              }
+              return;
+            }
+
+            // Image exists -> title + image (responsive)
+            if (title) box.appendChild(el('div', 'mediaTitle', escapeHtml(title)));
+
+            const img = document.createElement('img');
+            img.loading = "lazy";
+            img.decoding = "async";
+            img.alt = title || "Custom";
+            img.src = imageUrl;
+            box.appendChild(img);
+
+            flow.appendChild(box);
+            return;
+          }
+
+          // ----- DISCORD (default) -----
+          const nominee = el('div', 'nominee');
+          nominee.style.setProperty('--i', i);
+
+          const title = p?.name ?? p?.title ?? "Nominee";
+          const subtitle = p?.tag ?? p?.subtitle ?? "";
+          const imageUrl = p?.avatarUrl ?? p?.imageUrl ?? p?.iconUrl ?? "https://cdn.discordapp.com/embed/avatars/0.png";
+
+          const ava = el('div', 'nomineeAva');
+          const img = document.createElement('img');
+          img.loading = "lazy";
+          img.decoding = "async";
+          img.alt = title;
+          img.src = imageUrl;
+          ava.appendChild(img);
+
+          const name = el('div', 'nomineeName', escapeHtml(title));
+          const tag = el('div', 'nomineeTag', escapeHtml(subtitle));
+
+          nominee.appendChild(ava);
+          nominee.appendChild(name);
+          if (String(subtitle || "").trim()) nominee.appendChild(tag);
+
+          flow.appendChild(nominee);
+        });
+
+        nomineesBlock.appendChild(flow);
+        panel.appendChild(nomineesBlock);
+
+        wrap.appendChild(panel);
+        page.appendChild(wrap);
+        pages.appendChild(page);
+        sections.push(page);
+      });
+
+      // Outro
+      const outro = el('section', 'page');
+      outro.dataset.index = String(sections.length);
+      outro.dataset.kind = 'outro';
+
+      const outroWrap = el('div', 'wrap');
+      const outroPanel = el('div', 'panel hero');
+      outroPanel.appendChild(el('div', 'kicker', `${TROPHY_SVG} ${escapeHtml(cfg.siteTitle || "Zeart Awards 2025")}`));
+      outroPanel.appendChild(el('div', 'title', escapeHtml(cfg.afterwordTitle || "Финал")));
+      outroPanel.appendChild(el('div', 'subtitle', escapeHtml(cfg.afterwordText || "Спасибо за участие!")));
+
+      const backAct = el('div', 'introActions');
+      const backTop = el('div', 'pill', `В начало`);
+      backTop.addEventListener('click', () => scrollToIndex(0));
+      backAct.appendChild(backTop);
+
+      if (nomCount > 0) {
+        const backNom = el('div', 'pill', `К номинациям`);
+        backNom.addEventListener('click', () => scrollToIndex(1));
+        backAct.appendChild(backNom);
+      }
+      outroPanel.appendChild(backAct);
+
+      outroWrap.appendChild(outroPanel);
+      outro.appendChild(outroWrap);
+      pages.appendChild(outro);
+      sections.push(outro);
+
+      const bottomSpacer = document.createElement('div');
+      bottomSpacer.className = 'bottomSpacer';
+      pages.appendChild(bottomSpacer);
+
+      computeTopOffset();
+      updateMediaMaxH();
+      setTimeout(() => { computeTopOffset(); updateMediaMaxH();  }, 0);
+
+      setActive(0, { initial: true });
+      setupObserver();
+      updateNextVisibility();
+    }
+
+    function updateNextVisibility(){
+      nextBtn.style.opacity = (currentIndex >= sections.length - 1) ? 0 : 1;
+      nextBtn.style.pointerEvents = (currentIndex >= sections.length - 1) ? 'none' : 'auto';
+    }
+
+
+    function prepareAndActivate(targetIndex, prevIndex){
+      const token = ++prepToken;
+      const page = sections[targetIndex];
+      if (!page) return;
+
+      // Prepare: keep panel hidden, compute sizes, then show
+      page.classList.add('preparing');
+      page.classList.remove('active', 'leaving');
+
+      // Ensure top offset is final (avoid animating header affecting measure)
+      computeTopOffset();
+
+      // Measure twice in rAF to ensure layout is fully committed
+      requestAnimationFrame(() => {
+        if (token !== prepToken) return;
+        updateMediaMaxH(page);
+        requestAnimationFrame(() => {
+          if (token !== prepToken) return;
+          updateMediaMaxH(page);
+
+          // Activate
+          page.classList.add('active');
+          page.classList.remove('preparing', 'leaving');
+        });
+      });
+    }
+
+    function setActive(i, opts = {}){
+      const target = Math.max(0, Math.min(i, sections.length - 1));
+      if (!opts.initial && target === currentIndex) return;
+
+      const prev = currentIndex;
+      currentIndex = target;
+
+      const kind = sections[currentIndex]?.dataset?.kind || '';
+      const prevKind = sections[prev]?.dataset?.kind || '';
+      const hideTopbar = (kind === 'intro');
+      // When switching intro -> nominations, avoid measuring while header transitions
+      const introToNom = (!opts.initial && prevKind === 'intro' && kind === 'nomination');
+      if (introToNom) topbar.classList.add('noTrans');
+      topbar.classList.toggle('isHidden', hideTopbar);
+      computeTopOffset();
+      updateMediaMaxH();
+      if (introToNom) requestAnimationFrame(() => topbar.classList.remove('noTrans'));
+
+      // Beautiful reveal when leaving preface -> nominations
+
+      if (!opts.initial && prevKind === 'intro' && kind === 'nomination'){
+        sections[currentIndex].classList.add('reveal');
+        setTimeout(() => sections[currentIndex]?.classList?.remove('reveal'), 900);
+      }
+
+      // cleanup stale classes to avoid ghosting when fast-scrolling
       sections.forEach((s, idx) => {
-        const d = Math.abs(s.getBoundingClientRect().top - containerTop);
-        if (d < bestDist){
-          bestDist = d;
-          best = idx;
+        if (idx !== currentIndex && idx !== prev) {
+          s.classList.remove('active', 'leaving', 'reveal');
         }
       });
-      return best;
-    }
 
-    pages.addEventListener('scroll', () => {
-      const i = findClosestIndex();
-      setActive(i);
-    }, { passive: true });
+      const nomCount = (cfg.nominations && cfg.nominations.length) || 0;
+      const isNomPage = currentIndex >= 1 && currentIndex <= nomCount;
+
+      if (isNomPage){
+        const nom = cfg.nominations[currentIndex - 1] || null;
+        ddLabel.textContent = nom?.title || `Номинация ${currentIndex}`;
+      } else {
+        ddLabel.textContent = "Номинации";
+      }
+
+      menuItems.forEach((m) => {
+        const si = Number(m.dataset.sectionIndex || -1);
+        m.classList.toggle('active', si === currentIndex);
+      });
+
+      updateNextVisibility();
+
+      if (!opts.initial && sections[prev]) {
+        sections[prev].classList.add('leaving');
+        sections[prev].classList.remove('active');
+        if (leaveTimer) clearTimeout(leaveTimer);
+        leaveTimer = setTimeout(() => {
+          sections[prev] && sections[prev].classList.remove('leaving');
+        }, 380);
+      }
+
+      const targetEl = sections[currentIndex];
+      if (targetEl) {
+        if (targetEl.dataset.kind === 'nomination') {
+          prepareAndActivate(currentIndex, prev);
+        } else {
+          targetEl.classList.add('active');
+          targetEl.classList.remove('leaving','preparing');
+        }
+      }
+
+      fx.clearBursts();
+
+      // Effects ONLY for nominations
+      if (!opts.initial && isNomPage) {
+        const panel = sections[currentIndex]?.querySelector('.panel');
+        if (panel) {
+          let fired = false;
+          const onEnd = (e) => {
+            if (fired) return;
+            if (e && e.propertyName && e.propertyName !== 'transform') return;
+            fired = true;
+            panel.removeEventListener('transitionend', onEnd);
+            fx.showAtPanel(panel);
+          };
+          panel.addEventListener('transitionend', onEnd);
+
+          setTimeout(() => {
+            if (fired) return;
+            fired = true;
+            panel.removeEventListener('transitionend', onEnd);
+            fx.showAtPanel(panel);
+          }, 380);
+        }
+      }
+    }
 
     nextBtn.addEventListener('click', () => {
       scrollToIndex(Math.min(currentIndex + 1, sections.length - 1));
     });
+
+    function openMenu(){
+      ddBtn.setAttribute('aria-expanded','true');
+      menu.classList.add('open');
+      const active = menuItems.find(m => Number(m.dataset.sectionIndex) === currentIndex) || menuItems[0];
+      active && active.focus && active.focus({ preventScroll:true });
+    }
+    function closeMenu(){
+      ddBtn.setAttribute('aria-expanded','false');
+      menu.classList.remove('open');
+    }
+    function toggleMenu(){
+      if (menu.classList.contains('open')) closeMenu(); else openMenu();
+    }
+
+    ddBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      toggleMenu();
+    });
+
+    document.addEventListener('click', (e) => {
+      if (!menu.classList.contains('open')) return;
+      if (!dropdown.contains(e.target)) closeMenu();
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (!menu.classList.contains('open')) return;
+      if (e.key === 'Escape') { closeMenu(); ddBtn.focus(); }
+    });
+
+    let io = null;
+    function setupObserver(){
+      if (io) io.disconnect();
+      io = new IntersectionObserver((entries) => {
+        let best = null;
+        for (const e of entries){
+          if (!best || e.intersectionRatio > best.intersectionRatio) best = e;
+        }
+        if (best && best.isIntersecting && best.intersectionRatio >= 0.62) {
+          const idx = Number(best.target.dataset.index || 0);
+          setActive(idx);
+        }
+      }, { root: pages, threshold: [0.35, 0.5, 0.62, 0.75, 0.9] });
+      sections.forEach(s => io.observe(s));
+    }
+
+    window.addEventListener('resize', () => {
+      computeTopOffset();
+      updateMediaMaxH();
+    }, { passive: true });
+
+    // ===== FX engine (snow always; sequential bursts) =====
+    const fx = (() => {
+      const canvas = document.getElementById('fx');
+      const ctx = canvas.getContext('2d', { alpha: true });
+
+      let w = 0, h = 0, dpr = Math.min(2, window.devicePixelRatio || 1);
+
+      const snow = [];
+      const bursts = [];
+      const timers = [];
+
+      function resize(){
+        dpr = Math.min(2, window.devicePixelRatio || 1);
+        w = Math.floor(window.innerWidth);
+        h = Math.floor(window.innerHeight);
+        canvas.width = Math.floor(w * dpr);
+        canvas.height = Math.floor(h * dpr);
+        canvas.style.width = w + "px";
+        canvas.style.height = h + "px";
+        ctx.setTransform(dpr,0,0,dpr,0,0);
+      }
+
+      const palette = [
+        (a)=>`rgba(124,92,255,${a})`,
+        (a)=>`rgba(0,212,255,${a})`,
+        (a)=>`rgba(255,79,216,${a})`,
+        (a)=>`rgba(255,184,0,${a})`,
+      ];
+
+      function rand(min, max){ return min + Math.random() * (max - min); }
+      function pick(arr){ return arr[(Math.random()*arr.length)|0]; }
+
+      function initSnow(){
+        snow.length = 0;
+        const count = Math.max(80, Math.floor((w*h) / 26000));
+        for (let i=0;i<count;i++){
+          snow.push({
+            x: rand(0,w),
+            y: rand(0,h),
+            r: rand(1.2, 2.9),
+            vx: rand(-0.40, 0.40),
+            vy: rand(0.65, 1.55),
+            a: rand(0.22, 0.62)
+          });
+        }
+      }
+
+      function addSpark(x, y, vx, vy, colFn){
+        bursts.push({
+          kind: 'spark',
+          x, y,
+          vx, vy,
+          life: rand(66, 112),
+          age: 0,
+          g: 0.052,
+          colFn,
+          size: rand(1.8, 3.6),
+          drag: rand(0.985, 0.993)
+        });
+      }
+
+      function addFireworkMega(x, y){
+        const colFn = pick(palette);
+        bursts.push({ kind:'flare', x, y, colFn, life: 34, age: 0, radius: rand(58, 78) });
+
+        const n = 220;
+        for (let i=0;i<n;i++){
+          const ang = rand(0, Math.PI*2);
+          const sp = rand(3.2, 10.8) * (Math.random()<0.22 ? 1.28 : 1);
+          const jitter = rand(-0.9, 0.9);
+          addSpark(x, y, Math.cos(ang)*sp + jitter, Math.sin(ang)*sp - rand(0, 3.0), colFn);
+        }
+
+        const ringN = 84;
+        const ringSp = rand(8.6, 12.6);
+        for (let i=0;i<ringN;i++){
+          const ang = (i / ringN) * Math.PI*2 + rand(-0.04, 0.04);
+          addSpark(x, y, Math.cos(ang)*ringSp, Math.sin(ang)*ringSp, colFn);
+        }
+
+        const innerN = 70;
+        const innerSp = rand(4.4, 6.8);
+        for (let i=0;i<innerN;i++){
+          const ang = rand(0, Math.PI*2);
+          addSpark(x, y, Math.cos(ang)*innerSp, Math.sin(ang)*innerSp - rand(0,1.6), colFn);
+        }
+      }
+
+      function addConfettiMega(x, y){
+        const n = 120;
+        const colFn = pick(palette);
+        for (let i=0;i<n;i++){
+          bursts.push({
+            kind: 'confetti',
+            x, y,
+            vx: rand(-6.2, 6.2),
+            vy: rand(-5.2, 2.2),
+            life: rand(96, 150),
+            age: 0,
+            g: 0.082,
+            colFn,
+            w: rand(7, 13),
+            hh: rand(11, 20),
+            rot: rand(0, Math.PI*2),
+            vr: rand(-0.30, 0.30),
+            a: rand(0.78, 0.99),
+            drag: rand(0.988, 0.996)
+          });
+        }
+      }
+
+      function showAtPanel(panel){
+        const r = panel.getBoundingClientRect();
+        const xMin = Math.max(60, r.left - 320);
+        const xMax = Math.min(w - 60, r.right + 320);
+        const yMin = Math.max(70, r.top - 110);
+        const yMax = Math.min(h * 0.55, r.top + 260);
+
+        const steps = [
+          { t:   0, fn: () => addFireworkMega(rand(xMin, xMax), rand(yMin, yMax)) },
+          { t: 180, fn: () => addFireworkMega(rand(xMin, xMax), rand(yMin, yMax)) },
+          { t: 340, fn: () => addConfettiMega(rand(xMin, xMax), rand(yMin, yMax) + 40) },
+          { t: 520, fn: () => addFireworkMega(rand(xMin, xMax), rand(yMin, yMax)) },
+          { t: 700, fn: () => addFireworkMega(rand(xMin, xMax), rand(yMin, yMax)) },
+          { t: 900, fn: () => addConfettiMega(rand(xMin, xMax), rand(yMin, yMax) + 50) },
+          { t: 1120, fn: () => addFireworkMega(rand(xMin, xMax), rand(yMin, yMax)) },
+          { t: 1300, fn: () => addConfettiMega(rand(xMin, xMax), rand(yMin, yMax) + 50) },
+          { t: 1500, fn: () => addFireworkMega(rand(xMin, xMax), rand(yMin, yMax)) },
+        ];
+
+        for (const s of steps){
+          const id = setTimeout(() => s.fn(), s.t);
+          timers.push(id);
+        }
+      }
+
+      function clearBursts(){
+        while (timers.length) clearTimeout(timers.pop());
+        bursts.length = 0;
+      }
+
+      function step(){
+        ctx.clearRect(0,0,w,h);
+
+        // snow
+        ctx.save();
+        ctx.globalCompositeOperation = 'lighter';
+        for (const s of snow){
+          s.x += s.vx;
+          s.y += s.vy;
+
+          if (s.y > h + 10){ s.y = -10; s.x = rand(0,w); }
+          if (s.x < -10) s.x = w + 10;
+          if (s.x > w + 10) s.x = -10;
+
+          ctx.globalAlpha = s.a;
+          ctx.beginPath();
+          ctx.arc(s.x, s.y, s.r, 0, Math.PI*2);
+          ctx.fillStyle = 'rgba(255,255,255,0.92)';
+          ctx.fill();
+        }
+        ctx.restore();
+
+        // bursts
+        ctx.save();
+        ctx.globalCompositeOperation = 'lighter';
+
+        for (let i=bursts.length-1;i>=0;i--){
+          const p = bursts[i];
+          p.age++;
+
+          if (p.kind === 'flare'){
+            const t = p.age / p.life;
+            const a = (1 - t);
+            const rad = (p.radius || 64) + t * 140;
+            ctx.globalAlpha = Math.max(0, a * 0.62);
+            const g = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, rad);
+            g.addColorStop(0, p.colFn(0.72));
+            g.addColorStop(1, 'rgba(0,0,0,0)');
+            ctx.fillStyle = g;
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, rad, 0, Math.PI*2);
+            ctx.fill();
+            if (p.age >= p.life) bursts.splice(i,1);
+            continue;
+          }
+
+          if (p.kind === 'spark'){
+            p.vy += p.g;
+            p.vx *= p.drag;
+            p.vy *= p.drag;
+            p.x += p.vx;
+            p.y += p.vy;
+
+            const t = p.age / p.life;
+            const a = (1 - t);
+
+            ctx.globalAlpha = Math.max(0, a);
+            ctx.strokeStyle = p.colFn(Math.min(0.98, 0.28 + a));
+            ctx.lineWidth = p.size;
+            ctx.lineCap = 'round';
+            ctx.beginPath();
+            ctx.moveTo(p.x - p.vx*0.9, p.y - p.vy*0.9);
+            ctx.lineTo(p.x, p.y);
+            ctx.stroke();
+
+            ctx.globalAlpha = Math.max(0, a * 0.80);
+            ctx.fillStyle = p.colFn(Math.min(0.99, 0.34 + a));
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, p.size * 0.92, 0, Math.PI*2);
+            ctx.fill();
+
+            if (p.age >= p.life || p.y > h + 140) bursts.splice(i,1);
+            continue;
+          }
+
+          if (p.kind === 'confetti'){
+            p.vy += p.g;
+            p.vx *= p.drag;
+            p.vy *= p.drag;
+            p.x += p.vx;
+            p.y += p.vy;
+            p.rot += p.vr;
+
+            const t = p.age / p.life;
+            const a = (1 - t) * p.a;
+
+            ctx.save();
+            ctx.globalAlpha = Math.max(0, a);
+            ctx.translate(p.x, p.y);
+            ctx.rotate(p.rot);
+            ctx.fillStyle = p.colFn(Math.min(0.99, 0.30 + a));
+            ctx.fillRect(-p.w/2, -p.hh/2, p.w, p.hh);
+            ctx.restore();
+
+            if (p.age >= p.life || p.y > h + 170) bursts.splice(i,1);
+            continue;
+          }
+        }
+
+        ctx.restore();
+        requestAnimationFrame(step);
+      }
+
+      function start(){
+        resize();
+        initSnow();
+        requestAnimationFrame(step);
+      }
+
+      window.addEventListener('resize', () => {
+        resize();
+        initSnow();
+      }, { passive: true });
+
+      start();
+      return { showAtPanel, clearBursts };
+    })();
 
     (async function init(){
       cfg = await loadConfig();

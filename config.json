@@ -1,27 +1,83 @@
 {
   "siteTitle": "Zeart Awards 2025",
-  "siteSubtitle": "Годовые номинации участников Discord сервера",
+  "siteSubtitle": "Годовые номинации участников Zeart",
   "nominations": [
     {
-      "id": "meme",
-      "title": "Мем года",
-      "shortTitle": "Мем",
-      "description": "Кто сделал год веселее всех — по версии легенд.",
+      "id": "member",
+      "title": "Участник года",
+      "description": "Самый лучший участник",
       "nominees": [
         {
-          "id": "123456789012345678",
-          "name": "Zeart",
-          "tag": "@zeart",
-          "avatarUrl": "https://cdn.discordapp.com/embed/avatars/0.png"
+          "type": "discord",
+          "id": "290506098052694028",
+          "name": "TheZipa",
+          "tag": "@thezipa",
+          "avatarUrl": "https://cdn.discordapp.com/avatars/290506098052694028/a_ee53e44f58aecc5602f0a73e4e8e5ae1.gif?size=256"
         }
       ]
     },
     {
-      "id": "helper",
-      "title": "Помощник года",
-      "shortTitle": "Помощник",
-      "description": "Всегда рядом, всегда в теме, всегда спасает.",
-      "nominees": []
+      "id": "ban",
+      "title": "Бан года",
+      "description": "Участник, которого нужно забанить",
+      "nominees": [
+        {
+          "type": "discord",
+          "id": "449278505759539200",
+          "name": "0",
+          "tag": "@sosnoviybax",
+          "avatarUrl": "https://cdn.discordapp.com/avatars/449278505759539200/d115da17356640350f735f28902b1bf9.png?size=256"
+        }
+      ]
+    },
+    {
+      "id": "masterpiece",
+      "title": "Художники года",
+      "description": "Лучшие художники в этом году",
+      "nominees": [
+        {
+          "type": "discord",
+          "id": "381773709729464320",
+          "name": "Ну шо ты деревня",
+          "tag": "@utsume_sama",
+          "avatarUrl": "https://cdn.discordapp.com/avatars/381773709729464320/5de56243250f16f004c617e3aa5f2c28.png?size=256"
+        },
+        {
+          "type": "discord",
+          "id": "420886647538712576",
+          "name": "Хурма",
+          "tag": "@viencess",
+          "avatarUrl": "https://cdn.discordapp.com/avatars/420886647538712576/7c734898bc4b080940ded587a7b7acba.png?size=256"
+        }
+      ]
+    },
+    {
+      "id": "game",
+      "title": "Игра года",
+      "description": "Лучшая игра этого года",
+      "nominees": [
+        {
+          "type": "custom",
+          "imageUrl": "assets/valorant.jpg",
+          "title": "VALORANT"
+        }
+      ]
+    },
+    {
+      "id": "clip",
+      "title": "Клип года",
+      "description": "Лучший клип в этом году",
+      "nominees": [
+        {
+          "type": "video",
+          "videoUrl": "assets/ytro1.mp4",
+          "title": "Утро"
+        }
+      ]
     }
-  ]
+  ],
+  "prefaceTitle": "Добро пожаловать на Zeart Awards 2025",
+  "prefaceText": "Здесь собраны самые лучшие годовые номинации Zeart, которые были отобраны участниками сервера",
+  "afterwordTitle": "Спасибо, что были с Zeart!",
+  "afterwordText": "Это был хоть и довольно скромный год, однако мы в этом году увидели и много нового, интересного, атмосферного и приятного. Большое спасибо всем, кто в этом году был на Zeart и проводил время в нашей комании. Очень надеемся, что в будущем наша уютное сообщество станет ещё теплее и пополнит компанию новыми интересными и крутыми ребятами ✨"
 }
