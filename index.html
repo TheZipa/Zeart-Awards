@@ -56,15 +56,7 @@
       border-radius: 999px;
       box-shadow: 0 10px 20px rgba(0,0,0,.25);
     }
-    .topSpacer{
-      height: calc(var(--topOffset) + 10px);
-      scroll-snap-align: none;
-    }
-    .bottomSpacer{
-      height: 96px;
-      scroll-snap-align: none;
-    }
-
+        
     .pages::-webkit-scrollbar-thumb:hover{
       background: linear-gradient(180deg, rgba(124,92,255,.58), rgba(0,212,255,.45));
     }
@@ -135,9 +127,6 @@
       backdrop-filter: blur(14px);
       box-shadow: 0 10px 50px rgba(0,0,0,.35);
     }
-
-    .topbar.noTrans{ transition: none !important; }
-
     .topbar.isHidden{
       opacity: 0;
       transform: translateY(-14px);
@@ -325,28 +314,24 @@
       overflow-y: auto;
       scroll-snap-type: y mandatory;
       scroll-behavior: smooth;
-
-      /* Snap should respect the fixed header */
-      scroll-padding-top: calc(var(--topOffset) + 10px);
-
-      /* Layout padding (small) */
-      padding: 18px;
+      padding: 0;
     }
 
     .page{
       scroll-snap-align: start;
       scroll-margin-top: 0px;
 
-      min-height: calc(100vh - var(--topOffset) - 28px);
+      height: 100vh;
       display:flex;
       align-items: center;
       justify-content: center;
-      padding: 18px 0 22px;
+      padding: calc(var(--topOffset) + 18px) 18px 96px;
+      box-sizing: border-box;
     }
 
     .page[data-kind="nomination"]{
       align-items: center;
-      padding-top: 18px;
+      /* keep header-safe padding from .page; don't override padding-top */
     }
 
 .wrap{
@@ -704,7 +689,7 @@
     .nomineeCustom img{
       display:block;
       width: auto;
-      max-width: min(860px, 92vw);
+      max-width: min(1040px, 100%);
       max-height: min(var(--mediaMaxH), 52vh);
       height: auto;
       object-fit: contain;
@@ -747,7 +732,7 @@
     }
 
     .customTitleOnly{
-      max-width: min(860px, 92vw);
+      max-width: min(1040px, 100%);
       padding: 26px 26px;
       border-radius: 18px;
       border: 1px solid rgba(255,255,255,.12);
@@ -761,7 +746,7 @@
 
     /* Video thumb (embedded) */
     .videoThumb{
-      width: min(860px, 92vw, calc(var(--mediaMaxH) * 16 / 9));
+      width: min(1040px, 100%, calc(var(--mediaMaxH) * 16 / 9));
       border-radius: 22px;
       border: 1px solid rgba(255,255,255,.12);
       background: #000;
@@ -820,9 +805,9 @@
   
     /* Nomination card sizing: fixed aspect ratio that always fits the viewport */
     .nomPanel{
-      --availH: calc(100vh - var(--topOffset) - 150px);
-      height: min(var(--availH), 820px);
-      width: min(1200px, calc(100vw - 36px), calc(min(var(--availH), 820px) * 16 / 10));
+      --availH: calc(100vh - var(--topOffset) - 172px);
+      height: min(var(--availH), 780px);
+      width: min(1200px, calc(100vw - 36px), calc(min(var(--availH), 780px) * 16 / 10));
       aspect-ratio: 16 / 10;
       display: flex;
       flex-direction: column;
@@ -945,13 +930,64 @@
       transform: scale(.78) translateY(10px) !important;
     }
 
+  
+    /* Responsive content scaling inside nomination card */
+    .nomPanel{
+      --cardW: clamp(240px, 18vw, 420px);
+      --ava: clamp(150px, 12.5vw, 300px);
+      --cardPad: clamp(14px, 1.4vw, 20px);
+      --cardGap: clamp(10px, 1.1vw, 16px);
+      --flowGap: clamp(14px, 1.9vw, 28px);
+    }
+    .nomPanel .nomineesFlow{
+      gap: var(--flowGap);
+      padding: 10px 0;
+    }
+    .nomPanel .nominee{
+      width: var(--cardW);
+      padding: var(--cardPad);
+      gap: var(--cardGap);
+    }
+    .nomPanel .nomineeAva{
+      width: var(--ava);
+      height: var(--ava);
+      border-radius: clamp(34px, 3.0vw, 62px);
+    }
+    .nomPanel .nomineeName{
+      font-size: clamp(15px, 1.18vw, 24px);
+      max-width: calc(var(--cardW) - 20px);
+    }
+    .nomPanel .nomineeTag{
+      font-size: clamp(13px, 1.02vw, 20px);
+      max-width: calc(var(--cardW) - 20px);
+    }
+
+    .nomPanel .nomineeMedia{
+      max-width: min(1040px, 100%);
+      gap: clamp(12px, 1.2vw, 18px);
+    }
+    .nomPanel .videoThumb{
+      width: min(1040px, 100%, calc(var(--mediaMaxH) * 16 / 9));
+    }
+    .nomPanel .nomineeCustom img{
+      max-width: min(1040px, 100%);
+      max-height: min(var(--mediaMaxH), 66vh);
+    }
+
+  
+    /* Desktop tuning (reduce empty space, scale content up) */
+    @media (min-width: 1200px) and (min-height: 800px){
+      .hero{ padding: 28px 28px 22px; }
+      .nomineesBlock{ margin-top: 18px; padding-top: 16px; }
+    }
+
   </style>
 </head>
 
 <body>
   <canvas id="fx"></canvas>
 
-  <div class="topbar" id="topbar">
+  <div class="topbar isHidden" id="topbar">
     <div></div>
 
     <div class="brandCenter" aria-label="Zeart Awards 2025">
@@ -1208,13 +1244,7 @@ function computeTopOffset(){
       siteTitleTop.textContent = cfg.siteTitle || "Zeart Awards 2025";
       subtitleTop.textContent = cfg.siteSubtitle || "Годовые номинации участников Zeart";
 
-      pages.innerHTML = '';
-
-      // Spacer to prevent header overlap on the very first snap
-      const topSpacer = document.createElement('div');
-      topSpacer.className = 'topSpacer';
-      pages.appendChild(topSpacer);
-      menu.innerHTML = '';
+      pages.innerHTML = '';      menu.innerHTML = '';
       sections = [];
       menuItems = [];
       currentIndex = 0;
@@ -1425,11 +1455,6 @@ const act = el('div', 'introActions');
       outro.appendChild(outroWrap);
       pages.appendChild(outro);
       sections.push(outro);
-
-      const bottomSpacer = document.createElement('div');
-      bottomSpacer.className = 'bottomSpacer';
-      pages.appendChild(bottomSpacer);
-
       computeTopOffset();
       updateMediaMaxH();
       setTimeout(() => { computeTopOffset(); updateMediaMaxH();  }, 0);
@@ -1445,31 +1470,50 @@ const act = el('div', 'introActions');
     }
 
 
-    function prepareAndActivate(targetIndex, prevIndex){
+    function prepareAndActivate(targetIndex, prevIndex, waitForTopbar = false){
       const token = ++prepToken;
       const page = sections[targetIndex];
       if (!page) return;
 
-      // Prepare: keep panel hidden, compute sizes, then show
       page.classList.add('preparing');
       page.classList.remove('active', 'leaving');
 
-      // Ensure top offset is final (avoid animating header affecting measure)
-      computeTopOffset();
-
-      // Measure twice in rAF to ensure layout is fully committed
-      requestAnimationFrame(() => {
+      const doMeasureAndShow = () => {
         if (token !== prepToken) return;
-        updateMediaMaxH(page);
+        computeTopOffset();
+
         requestAnimationFrame(() => {
           if (token !== prepToken) return;
           updateMediaMaxH(page);
-
-          // Activate
-          page.classList.add('active');
-          page.classList.remove('preparing', 'leaving');
+          requestAnimationFrame(() => {
+            if (token !== prepToken) return;
+            updateMediaMaxH(page);
+            page.classList.add('active');
+            page.classList.remove('preparing', 'leaving');
+          });
         });
-      });
+      };
+
+      if (waitForTopbar){
+        let done = false;
+        const onEnd = (e) => {
+          if (done) return;
+          if (e && e.propertyName && e.propertyName !== 'transform' && e.propertyName !== 'opacity') return;
+          done = true;
+          topbar.removeEventListener('transitionend', onEnd);
+          doMeasureAndShow();
+        };
+        topbar.addEventListener('transitionend', onEnd);
+        setTimeout(() => {
+          if (done) return;
+          done = true;
+          topbar.removeEventListener('transitionend', onEnd);
+          doMeasureAndShow();
+        }, 380);
+        return;
+      }
+
+      doMeasureAndShow();
     }
 
     function setActive(i, opts = {}){
@@ -1481,15 +1525,9 @@ const act = el('div', 'introActions');
 
       const kind = sections[currentIndex]?.dataset?.kind || '';
       const prevKind = sections[prev]?.dataset?.kind || '';
-      const hideTopbar = (kind === 'intro');
-      // When switching intro -> nominations, avoid measuring while header transitions
-      const introToNom = (!opts.initial && prevKind === 'intro' && kind === 'nomination');
-      if (introToNom) topbar.classList.add('noTrans');
-      topbar.classList.toggle('isHidden', hideTopbar);
+      const hideTopbar = (kind === 'intro');      topbar.classList.toggle('isHidden', hideTopbar);
       computeTopOffset();
       updateMediaMaxH();
-      if (introToNom) requestAnimationFrame(() => topbar.classList.remove('noTrans'));
-
       // Beautiful reveal when leaving preface -> nominations
 
       if (!opts.initial && prevKind === 'intro' && kind === 'nomination'){
@@ -1533,7 +1571,7 @@ const act = el('div', 'introActions');
       const targetEl = sections[currentIndex];
       if (targetEl) {
         if (targetEl.dataset.kind === 'nomination') {
-          prepareAndActivate(currentIndex, prev);
+          prepareAndActivate(currentIndex, prev, (prevKind === 'intro' && kind === 'nomination'));
         } else {
           targetEl.classList.add('active');
           targetEl.classList.remove('leaving','preparing');
