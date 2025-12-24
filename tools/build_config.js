@@ -38,33 +38,112 @@ const DEFAULT_TEXTS = {
     "Это был мощный год. Увидимся на следующих номинациях — и да начнётся новый сезон легенд ✨",
 };
 
+function sleep(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+// Very small pacing between requests (Discord still rate-limits per route).
+// This helps avoid bursts in GitHub Actions where many nominees are resolved at once.
+let lastApiCallAt = 0;
+const MIN_API_INTERVAL_MS = Number(process.env.DISCORD_MIN_API_INTERVAL_MS || 120);
+
+async function pace() {
+  const now = Date.now();
+  const wait = lastApiCallAt + MIN_API_INTERVAL_MS - now;
+  if (wait > 0) await sleep(wait);
+  lastApiCallAt = Date.now();
+}
+
+
 function avatarUrl(userId, avatarHash) {
   if (!avatarHash) return "https://cdn.discordapp.com/embed/avatars/0.png";
   const ext = avatarHash.startsWith("a_") ? "gif" : "png";
   return `https://cdn.discordapp.com/avatars/${userId}/${avatarHash}.${ext}?size=256`;
 }
 
-async function api(path) {
-  const res = await fetch(`https://discord.com/api/v10${path}`, {
-    headers: { Authorization: `Bot ${token}` },
-  });
-  if (!res.ok) throw new Error(`Discord API ${res.status}: ${await res.text()}`);
-  return res.json();
+async function api(path, { retries = 10 } = {}) {
+  const url = `https://discord.com/api/v10${path}`;
+
+  for (let attempt = 0; attempt <= retries; attempt++) {
+    await pace();
+
+    const res = await fetch(url, {
+      headers: {
+        Authorization: `Bot ${token}`,
+        "User-Agent": "Zeart-Awards-Config-Builder (GitHub Actions)",
+      },
+    });
+
+    if (res.status === 429) {
+      // Discord returns JSON with retry_after (seconds)
+      let retryAfterSec = 1;
+      try {
+        const body = await res.json();
+        if (typeof body?.retry_after === "number") retryAfterSec = body.retry_after;
+      } catch {
+        // ignore
+      }
+
+      // Add a tiny jitter so multiple retries don't align
+      const jitterMs = 50 + Math.floor(Math.random() * 120);
+      const waitMs = Math.ceil(retryAfterSec * 1000) + jitterMs;
+
+      if (attempt >= retries) {
+        throw new Error(`Discord API 429 after ${retries + 1} attempts on ${path}`);
+      }
+
+      await sleep(waitMs);
+      continue;
+    }
+
+    // Retry transient server errors
+    if (res.status >= 500 && res.status <= 599) {
+      if (attempt >= retries) {
+        throw new Error(`Discord API ${res.status}: ${await res.text()}`);
+      }
+      const backoffMs = 250 * (attempt + 1);
+      await sleep(backoffMs);
+      continue;
+    }
+
+    if (!res.ok) throw new Error(`Discord API ${res.status}: ${await res.text()}`);
+    return res.json();
+  }
+
+  throw new Error(`Discord API failed unexpectedly for ${path}`);
 }
+
+
+const memberCache = new Map();
 
 // GET /guilds/{guild.id}/members/{user.id}
 async function fetchMember(userId) {
-  const m = await api(`/guilds/${guildId}/members/${userId}`);
-  const u = m.user || {};
-  const display = m.nick || u.global_name || u.username || userId;
+  const key = String(userId);
 
-  return {
-    type: "discord",
-    id: u.id,
-    name: display,
-    tag: u.username ? `@${u.username}` : "",
-    avatarUrl: avatarUrl(u.id, u.avatar),
-  };
+  // Deduplicate / cache requests within a single run to reduce rate-limit hits
+  if (memberCache.has(key)) return await memberCache.get(key);
+
+  const p = (async () => {
+    const m = await api(`/guilds/${guildId}/members/${key}`);
+    const u = m.user || {};
+    const display = m.nick || u.global_name || u.username || key;
+
+    return {
+      type: "discord",
+      id: u.id,
+      name: display,
+      tag: u.username ? `@${u.username}` : "",
+      avatarUrl: avatarUrl(u.id, u.avatar),
+    };
+  })();
+
+  memberCache.set(key, p);
+  try {
+    return await p;
+  } catch (e) {
+    memberCache.delete(key);
+    throw e;
+  }
 }
 
 function normalizeTexts(src) {
@@ -113,6 +192,7 @@ async function resolveNominee(n) {
   }
 
   if (typeof n !== "object") return null;
+  if (Object.keys(n).length === 0) return null;
 
   const type = (n.type || "").toLowerCase();
 
@@ -130,19 +210,29 @@ async function resolveNominee(n) {
     };
   }
 
-  // Custom: image + optional title (no name/tag/avatarUrl)
+  // Custom nominee:
+  // - With image: {type:"custom", imageUrl:"assets/game.jpg", title?: "..."}
+  // - Title-only: {type:"custom", title:"Game of the Year"} (no imageUrl)
+  // NOTE: Custom/video nominees must not have tag/avatarUrl (index.html ignores them anyway).
   if (type === "custom") {
     const imageUrl = n.imageUrl ?? n.path ?? n.src ?? n.url;
-    if (!imageUrl) throw new Error(`Custom nominee is missing "imageUrl"`);
+    let title = n.title ?? n.name ?? n.text;
 
-    let title = n.title;
+    // If no imageUrl, allow title-only custom nominee.
+    // If BOTH are missing, treat as empty entry and skip instead of failing the workflow.
+    if (!imageUrl) {
+      if (!title) return null;
+      return { type: "custom", title: String(title).trim() };
+    }
+
+    // If image exists but title missing, derive from filename
     if (!title) {
       const base = String(imageUrl).split("/").pop() || String(imageUrl);
       title = base.replace(/\.[^.]+$/, "").replace(/[_-]+/g, " ").trim();
     }
 
     const out = { type: "custom", imageUrl: String(imageUrl) };
-    if (title) out.title = String(title);
+    if (title) out.title = String(title).trim();
     return out;
   }
 
