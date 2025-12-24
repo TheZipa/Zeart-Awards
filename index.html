@@ -449,16 +449,22 @@
 
     .nomineesBlock{
       margin-top: 22px;
-      padding-top: 18px;
+      padding: 18px 16px; /* add inner air on sides + bottom/top */
       border-top: 1px solid rgba(255,255,255,.10);
+      flex: 1;
+      min-height: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
     }
         .nomineesFlow{
       display:flex;
-      flex-wrap: wrap;
+      flex-wrap: nowrap;
       gap: 18px;
-      align-items: flex-start;
+      align-items: center;
       justify-content: center;
-      padding-bottom: 4px;
+      padding: 0;
     }
 
     .nominee{
@@ -689,20 +695,21 @@
     .nomineeCustom img{
       display:block;
       width: auto;
+      height: min(var(--mediaMaxH), 56vh);
+      max-height: min(var(--mediaMaxH), 56vh);
       max-width: min(1040px, 100%);
-      max-height: min(var(--mediaMaxH), 52vh);
-      height: auto;
       object-fit: contain;
       border-radius: 22px;
-      border: 1px solid rgba(255,255,255,.12);
-      background: rgba(255,255,255,.04);
+      border: 0;
+      background: transparent;
       box-shadow: 0 22px 70px rgba(0,0,0,.40);
     }
 
 
     /* Media nominees (custom/video) - not Discord cards */
     .nomineeMedia{
-      width: 100%;
+      width: auto;
+      max-width: 100%;
       display:flex;
       flex-direction: column;
       align-items: center;
@@ -731,9 +738,9 @@
       text-shadow: 0 14px 40px rgba(0,0,0,.55);
     }
 
-    .customTitleOnly{
+        .customTitleOnly{
       max-width: min(1040px, 100%);
-      padding: 26px 26px;
+      padding: 22px 22px;
       border-radius: 18px;
       border: 1px solid rgba(255,255,255,.12);
       background: rgba(255,255,255,.05);
@@ -741,12 +748,26 @@
       text-align: center;
       line-height: 1.12;
       font-weight: 900;
-      font-size: clamp(22px, 3.2vw, 36px);
+      font-size: clamp(20px, 2.8vw, 32px);
+
+      /* Slightly different fit for title-only custom nominees (ONLY them) */
+      transform: scale(var(--fitScaleTitleOnly, 1));
+      transform-origin: center;
+      will-change: transform;
     }
+
+    .nomPanel .customTitleOnly{
+      font-size: calc(clamp(20px, 2.8vw, 40px) * var(--nomScale));
+      padding: calc(22px * var(--nomScale));
+    }
+
 
     /* Video thumb (embedded) */
     .videoThumb{
-      width: min(1040px, 100%, calc(var(--mediaMaxH) * 16 / 9));
+      height: min(var(--mediaMaxH), 56vh);
+      aspect-ratio: 16 / 9;
+      width: auto;
+      max-width: min(1040px, 100%);
       border-radius: 22px;
       border: 1px solid rgba(255,255,255,.12);
       background: #000;
@@ -814,24 +835,34 @@
       justify-content: flex-start;
     }
 
+    
+    /* Fit nominees to available area (no inner scroll, no clipping, less empty space) */
+    .nomineesFlow{
+      --fitScale: 1;
+      --fitScaleTitleOnly: 1;
+      transform: scale(var(--fitScale));
+      transform-origin: center;
+      will-change: transform;
+      transition: transform 220ms ease;
+    }
+
     /* Use the whole card area (no inner scroll); content stretches nicely */
     .nomPanel .nomineesBlock{
       margin-top: 12px;
-      padding: 18px 18px;
+      padding-top: calc(16px * var(--nomScale));
+      padding-bottom: calc(16px * var(--nomScale));
+      padding-left: calc(16px * var(--nomScale));
+      padding-right: calc(16px * var(--nomScale));
       border-top: 1px solid rgba(255,255,255,.10);
       flex: 1;
       display: flex;
       align-items: center;
       justify-content: center;
-      overflow: hidden; /* no inner scroll */
+      overflow: visible; /* no inner scroll */
     }
     .nomPanel .nomineesFlow{
-      width: 100%;
-      justify-content: center;
-      align-items: center;
-      align-content: center;
-      padding: 8px 0;
-
+      gap: var(--flowGap);
+      padding: calc(10px * var(--nomScale)) 0;
     }
 
     /* On narrow/tall screens, slightly taller ratio */
@@ -933,15 +964,35 @@
   
     /* Responsive content scaling inside nomination card */
     .nomPanel{
-      --cardW: clamp(240px, 18vw, 420px);
-      --ava: clamp(150px, 12.5vw, 300px);
-      --cardPad: clamp(14px, 1.4vw, 20px);
-      --cardGap: clamp(10px, 1.1vw, 16px);
-      --flowGap: clamp(14px, 1.9vw, 28px);
+      --nomScale: 1;
+      --cardW: calc(clamp(240px, 18vw, 420px) * var(--nomScale));
+      --ava: calc(clamp(150px, 12.5vw, 300px) * var(--nomScale));
+      --cardPad: calc(clamp(14px, 1.4vw, 20px) * var(--nomScale));
+      --cardGap: calc(clamp(10px, 1.1vw, 16px) * var(--nomScale));
+      --flowGap: calc(clamp(14px, 1.9vw, 28px) * var(--nomScale));
     }
+
+    /* Scale typography & spacing together with nomination card */
+    .nomPanel.hero{
+      padding: calc(34px * var(--nomScale)) calc(30px * var(--nomScale)) calc(32px * var(--nomScale));
+    }
+    .nomPanel .title{
+      margin: calc(16px * var(--nomScale)) 0 calc(12px * var(--nomScale));
+      font-size: calc(clamp(30px, 3.8vw, 64px) * var(--nomScale));
+    }
+    .nomPanel .subtitle{
+      margin: 0 auto calc(10px * var(--nomScale));
+      font-size: calc(15px * var(--nomScale));
+    }
+    .nomPanel .nomineesBlock{
+      margin-top: calc(16px * var(--nomScale));
+      padding-top: calc(16px * var(--nomScale));
+      padding-bottom: calc(16px * var(--nomScale));
+    }
+
     .nomPanel .nomineesFlow{
       gap: var(--flowGap);
-      padding: 10px 0;
+      padding: 0 2px; /* tiny breathing room inside padded block */
     }
     .nomPanel .nominee{
       width: var(--cardW);
@@ -963,15 +1014,21 @@
     }
 
     .nomPanel .nomineeMedia{
+      width: auto;
       max-width: min(1040px, 100%);
       gap: clamp(12px, 1.2vw, 18px);
     }
     .nomPanel .videoThumb{
-      width: min(1040px, 100%, calc(var(--mediaMaxH) * 16 / 9));
+      height: min(var(--mediaMaxH), 56vh);
+      width: auto;
+      max-width: min(1040px, 100%);
     }
     .nomPanel .nomineeCustom img{
+      height: min(var(--mediaMaxH), 56vh);
+      max-height: min(var(--mediaMaxH), 56vh);
       max-width: min(1040px, 100%);
-      max-height: min(var(--mediaMaxH), 66vh);
+      border: 0;
+      background: transparent;
     }
 
   
@@ -979,6 +1036,21 @@
     @media (min-width: 1200px) and (min-height: 800px){
       .hero{ padding: 28px 28px 22px; }
       .nomineesBlock{ margin-top: 18px; padding-top: 16px; }
+    }
+
+  
+    /* Final: vertical breathing room inside nomination card under the divider (all nominee types) */
+    .page[data-kind="nomination"] .nomPanel .nomineesBlock{
+      /* space from divider to content + safe space to bottom border */
+      padding-top: calc(20px * var(--nomScale));
+      padding-bottom: calc(28px * var(--nomScale));
+      padding-left: calc(16px * var(--nomScale));
+      padding-right: calc(16px * var(--nomScale));
+    
+      overflow: visible; /* don't clip media shadows */
+    }
+    .page[data-kind="nomination"] .nomPanel .nomineesFlow{
+      padding: 0; /* let nomineesBlock padding create the vertical air */
     }
 
   </style>
@@ -1193,31 +1265,114 @@
 
     
     function updateMediaMaxH(pageEl){
-      // Compute available height for embedded media inside nomination panel so it never gets clipped.
-      const vh = window.innerHeight || 800;
-      const top = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--topOffset')) || 0;
-
+      // Update responsive variables based on the *actual* nomination card layout
       const pagesToUpdate = pageEl ? [pageEl] : [sections[currentIndex]].filter(Boolean);
 
       pagesToUpdate.forEach(page => {
         if (!page || page.dataset.kind !== 'nomination') return;
 
-        const panel = page.querySelector('.panel');
-        const hero = page.querySelector('.hero');
+        const panel = page.querySelector('.nomPanel');
         const nomineesBlock = page.querySelector('.nomineesBlock');
-        if (!panel || !hero || !nomineesBlock) return;
+        if (!panel || !nomineesBlock) return;
 
-        const bottomReserve = 118; // room for bottom button + safe area
-        const heroH = hero.getBoundingClientRect().height;
+        // Scale factor for all content in nomination card (helps on large screens and small screens)
+        const baseH = 660; // tuned for 16:10 card at "normal" desktop
+        const h = Math.max(1, panel.clientHeight);
+        let s = h / baseH;
+        s = Math.max(0.88, Math.min(1.28, s));
+        panel.style.setProperty('--nomScale', String(Math.round(s * 1000) / 1000));
 
-        const nbStyles = getComputedStyle(nomineesBlock);
-        const nbPad = (parseFloat(nbStyles.paddingTop)||0) + (parseFloat(nbStyles.paddingBottom)||0);
-        const nbBorder = (parseFloat(nbStyles.borderTopWidth)||0);
+        // Force reflow after changing CSS vars (so nomineesBlock height is up-to-date)
+        void panel.offsetHeight;
 
-        // A bit of extra breathing room
-        const maxH = Math.max(220, Math.floor(vh - top - bottomReserve - heroH - nbPad - nbBorder - 26));
-        page.style.setProperty('--mediaMaxH', maxH + 'px');
+        // Compute max height for media (video/custom image) inside nominees block
+        const nbH = Math.max(1, nomineesBlock.clientHeight);
+
+        // Reserve some space for media title + gaps (scaled)
+        const reserve = Math.round(84 * s);
+
+        // Allow media (video/custom) to take most of nomineesBlock height without inner scroll
+        const pad = Math.round(14 * s);
+        let mediaMaxH = nbH - reserve - pad;
+        // Clamp to a sane range and also respect overall panel height
+        mediaMaxH = Math.max(180, Math.min(mediaMaxH, h * 0.62));
+        page.style.setProperty('--mediaMaxH', `${Math.round(mediaMaxH)}px`);
       });
+    }
+
+    function fitNominees(page){
+      try{
+        if (!page || page.dataset.kind !== 'nomination') return;
+        const block = page.querySelector('.nomineesBlock');
+        const flow  = page.querySelector('.nomineesFlow');
+        if (!block || !flow) return;
+
+        // Clear scale for correct measurement
+        flow.style.setProperty('--fitScale', '1');
+        flow.style.setProperty('--fitScaleTitleOnly', '1');
+
+        const availW = Math.max(1, block.clientWidth);
+        const availH = Math.max(1, block.clientHeight);
+
+        // Give the content a bit more "air" vertically (so it never hugs divider/bottom).
+        // We intentionally fit to a slightly smaller height than the block provides.
+        const panel = page.querySelector('.nomPanel');
+        const ns = panel ? parseFloat(getComputedStyle(panel).getPropertyValue('--nomScale')) : 1;
+        const nomScale = Number.isFinite(ns) && ns > 0 ? ns : 1;
+        const vSafe = 16 * nomScale;          // ~12–16px effective safety on most screens
+        const effH = Math.max(1, availH - vSafe * 2);
+const kids = Array.from(flow.children).filter(el => el && el.offsetParent !== null);
+        if (!kids.length) return;
+
+        const cs = getComputedStyle(flow);
+        const gapStr = (cs.columnGap || cs.gap || "0").toString();
+        const gap = parseFloat(gapStr.split(" ")[0]) || 0;
+
+        let natW = 0;
+        let natH = 0;
+        for (const k of kids){
+          natW += (k.offsetWidth || 0);
+          natH = Math.max(natH, (k.offsetHeight || 0));
+        }
+        natW += gap * Math.max(0, kids.length - 1);
+
+        natW = Math.max(1, natW);
+        natH = Math.max(1, natH);
+
+        let s = Math.min(availW / natW, effH / natH);
+
+        // Never wrap vertically: shrink as needed, allow meaningful upscale on large screens
+        s = Math.max(0.60, Math.min(2.05, s));
+
+        flow.style.setProperty('--fitScale', String(Math.round(s * 1000) / 1000));
+        // Apply slightly different fit ONLY for custom title-only nominees
+        const hasTitleOnly = !!flow.querySelector('.customTitleOnly');
+        if (hasTitleOnly){
+          // keep readable on small scales; only shrink extra when there's room
+          const extra = (s >= 0.85) ? 0.92 : 1;
+          flow.style.setProperty('--fitScaleTitleOnly', String(extra));
+        } else {
+          flow.style.setProperty('--fitScaleTitleOnly', '1');
+        }
+      }catch(e){}
+    }
+
+    function watchMediaAndFit(page){
+      try{
+        if (!page || page.dataset.kind !== 'nomination') return;
+        const imgs = Array.from(page.querySelectorAll('img'));
+        imgs.forEach(img => {
+          if (img.complete) return;
+          img.addEventListener('load', () => {
+            updateMediaMaxH(page);
+            fitNominees(page);
+          }, { once: true });
+          img.addEventListener('error', () => {
+            updateMediaMaxH(page);
+            fitNominees(page);
+          }, { once: true });
+        });
+      }catch(e){}
     }
 
 
@@ -1293,7 +1448,7 @@ const act = el('div', 'introActions');
         item.setAttribute("role", "option");
         item.dataset.sectionIndex = String(sectionIndex);
         item.dataset.nomIndex = String(idx);
-        item.innerHTML = `${TROPHY_MINI_SVG}<span style="min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${escapeHtml(nom.title || `Номинация ${idx+1}`)}</span>`;
+        item.innerHTML = `${TROPHY_MINI_SVG}<span style="min-width:0;overflow:visible;text-overflow:ellipsis;white-space:nowrap;">${escapeHtml(nom.title || `Номинация ${idx+1}`)}</span>`;
         item.addEventListener('click', () => {
           closeMenu();
           scrollToIndex(sectionIndex);
@@ -1457,7 +1612,8 @@ const act = el('div', 'introActions');
       sections.push(outro);
       computeTopOffset();
       updateMediaMaxH();
-      setTimeout(() => { computeTopOffset(); updateMediaMaxH();  }, 0);
+      fitNominees(sections[currentIndex]);
+      setTimeout(() => { computeTopOffset(); updateMediaMaxH(); fitNominees(sections[currentIndex]); }, 0);
 
       setActive(0, { initial: true });
       setupObserver();
@@ -1488,6 +1644,8 @@ const act = el('div', 'introActions');
           requestAnimationFrame(() => {
             if (token !== prepToken) return;
             updateMediaMaxH(page);
+            watchMediaAndFit(page);
+            fitNominees(page);
             page.classList.add('active');
             page.classList.remove('preparing', 'leaving');
           });
@@ -1656,6 +1814,7 @@ const act = el('div', 'introActions');
     window.addEventListener('resize', () => {
       computeTopOffset();
       updateMediaMaxH();
+      fitNominees(sections[currentIndex]);
     }, { passive: true });
 
     // ===== FX engine (snow always; sequential bursts) =====
