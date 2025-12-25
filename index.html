@@ -62,6 +62,7 @@
     }
 
     .menu{
+      scrollbar-gutter: stable;
       scrollbar-width: thin;
       scrollbar-color: rgba(255,255,255,.22) rgba(255,255,255,.06);
     }
@@ -243,7 +244,7 @@
       top: calc(100% + 10px);
       right: 0;
       width: min(34vw, 230px);
-      max-height: var(--mediaMaxH);
+      max-height: min(52vh, 360px);
       overflow: auto;
       border-radius: 16px;
       background: rgba(0,0,0,.40);
@@ -303,7 +304,7 @@
         right: 50%;
         transform: translateX(50%);
         width: min(78vw, 280px);
-        max-height: var(--mediaMaxH);
+        max-height: min(55vh, 320px);
       }
       .brandText span{ max-width: 86vw; }
     }
@@ -858,7 +859,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      overflow: visible; /* no inner scroll */
+      overflow: hidden; /* no inner scroll */
     }
     .nomPanel .nomineesFlow{
       gap: var(--flowGap);
@@ -1046,8 +1047,6 @@
       padding-bottom: calc(28px * var(--nomScale));
       padding-left: calc(16px * var(--nomScale));
       padding-right: calc(16px * var(--nomScale));
-    
-      overflow: visible; /* don't clip media shadows */
     }
     .page[data-kind="nomination"] .nomPanel .nomineesFlow{
       padding: 0; /* let nomineesBlock padding create the vertical air */
@@ -1448,7 +1447,7 @@ const act = el('div', 'introActions');
         item.setAttribute("role", "option");
         item.dataset.sectionIndex = String(sectionIndex);
         item.dataset.nomIndex = String(idx);
-        item.innerHTML = `${TROPHY_MINI_SVG}<span style="min-width:0;overflow:visible;text-overflow:ellipsis;white-space:nowrap;">${escapeHtml(nom.title || `Номинация ${idx+1}`)}</span>`;
+        item.innerHTML = `${TROPHY_MINI_SVG}<span style="min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${escapeHtml(nom.title || `Номинация ${idx+1}`)}</span>`;
         item.addEventListener('click', () => {
           closeMenu();
           scrollToIndex(sectionIndex);
