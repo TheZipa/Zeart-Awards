@@ -694,7 +694,7 @@
     .page{ --mediaMaxH: 360px; }
 
     .nomineeCustom img{
-      display:block;
+display:block;
       width: auto;
       height: min(var(--mediaMaxH), 56vh);
       max-height: min(var(--mediaMaxH), 56vh);
@@ -703,8 +703,9 @@
       border-radius: 22px;
       border: 0;
       background: transparent;
-      box-shadow: 0 22px 70px rgba(0,0,0,.40);
-    }
+      box-shadow: 0 18px 58px rgba(0,0,0,.42);
+      margin-bottom: 6px;
+}
 
 
     /* Media nominees (custom/video) - not Discord cards */
@@ -765,15 +766,16 @@
 
     /* Video thumb (embedded) */
     .videoThumb{
-      height: min(var(--mediaMaxH), 56vh);
+height: min(var(--mediaMaxH), 56vh);
       aspect-ratio: 16 / 9;
       width: auto;
       max-width: min(1040px, 100%);
       border-radius: 22px;
       border: 1px solid rgba(255,255,255,.12);
       background: #000;
-      box-shadow: 0 22px 70px rgba(0,0,0,.40);
-      overflow: hidden;
+      box-shadow: 0 18px 58px rgba(0,0,0,.42);
+      margin-bottom: 6px;
+overflow: hidden;
       position: relative;
       cursor: pointer;
     }
@@ -850,6 +852,7 @@
     /* Use the whole card area (no inner scroll); content stretches nicely */
     .nomPanel .nomineesBlock{
       margin-top: 12px;
+      overflow: visible; /* allow media shadows inside the card */
       padding-top: calc(16px * var(--nomScale));
       padding-bottom: calc(16px * var(--nomScale));
       padding-left: calc(16px * var(--nomScale));
@@ -859,7 +862,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      overflow: hidden; /* no inner scroll */
+      /* overflow handled below to allow shadows */
     }
     .nomPanel .nomineesFlow{
       gap: var(--flowGap);
@@ -890,8 +893,7 @@
       width: 118px;
       height: 118px;
       border-radius: 34px;
-      overflow:hidden;
-      border: 1px solid rgba(255,255,255,.16);
+            border: 1px solid rgba(255,255,255,.16);
       background: rgba(255,255,255,.06);
       box-shadow: 0 22px 80px rgba(0,0,0,.45);
       position: relative;
@@ -1040,11 +1042,18 @@
     }
 
   
-    /* Final: vertical breathing room inside nomination card under the divider (all nominee types) */
+    
+    /* Allow internal media shadows (custom/video) to render without being clipped by nomineesBlock */
+    .page[data-kind="nomination"] .nomPanel .nomineesBlock{
+      overflow: visible !important; /* no inner scroll, but shadows can extend within the card */
+      padding-bottom: calc(46px * var(--nomScale)); /* extra safe space for box-shadows */
+    }
+
+/* Final: vertical breathing room inside nomination card under the divider (all nominee types) */
     .page[data-kind="nomination"] .nomPanel .nomineesBlock{
       /* space from divider to content + safe space to bottom border */
       padding-top: calc(20px * var(--nomScale));
-      padding-bottom: calc(28px * var(--nomScale));
+      padding-bottom: calc(34px * var(--nomScale));
       padding-left: calc(16px * var(--nomScale));
       padding-right: calc(16px * var(--nomScale));
     }
@@ -1062,16 +1071,25 @@
       flex-direction: column;
       gap: 10px;
       pointer-events: auto;
+      align-items: center;
     }
-    Npx;
-      font-size: 0;
-      line-height: 0;
+    .floatBtn{
+      width: 48px;
+      height: 48px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(0,0,0,.22);
+      backdrop-filter: blur(14px);
+      box-shadow: 0 10px 38px rgba(0,0,0,.35);
+      color: rgba(255,255,255,.86);
       cursor: pointer;
       display: inline-flex;
       align-items: center;
       justify-content: center;
       transition: transform .14s ease, background .14s ease, border-color .14s ease, box-shadow .14s ease, opacity .18s ease;
       user-select: none;
+      font-size: 0;
+      line-height: 0;
     }
     .floatBtn:hover{
       transform: translateY(-1px);
@@ -1082,77 +1100,80 @@
     .floatBtn:active{ transform: translateY(0px); box-shadow: 0 10px 38px rgba(0,0,0,.35); }
     .floatBtn:focus-visible{ outline: 2px solid rgba(124,92,255,.60); outline-offset: 2px; }
     .floatBtn.isOff{ opacity: .72; }
-    .floatBtn svg{ width: 20px; height: 20px; display:block; }
-
-    .floatBtn.isOff .muteSlash{ opacity: 1; }
-    .floatBtn.isOff .muteSlashGlow{ opacity: .55; filter: blur(.2px); }
-    .floatBtn.isOff .noteFill,
-    .floatBtn.isOff .noteStroke,
-    .floatBtn.isOff .noteStroke2{ opacity: .35; }
-
-
-    @media (max-width: 880px){
-      .floatingControls{
-        right: 12px;
-        bottom: calc(env(safe-area-inset-bottom, 0px) + 86px);
-      }
-      .floatBtn{ width: 46px; height: 46px; }
-    }
-
-/* Floating always-visible controls (fullscreen + music) */
-    .floatingControls{
-      position: fixed;
-      right: 18px;
-      bottom: calc(env(safe-area-inset-bottom, 0px) + 90px);
-      z-index: 70;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      pointer-events: auto;
-    }
-    .floatBtn{
-      width: 48px;
-      height: 48px;
-      border-radius: 999px;
-      border: 1px solid rgba(255,255,255,.14);
-      background: radial-gradient(120% 120% at 30% 20%, rgba(255,255,255,.10), rgba(255,255,255,.04)),
-                  rgba(0,0,0,.22);
-      backdrop-filter: blur(14px);
-      box-shadow: 0 14px 46px rgba(0,0,0,.42);
-      color: rgba(255,255,255,.92);
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      transition: transform .14s ease, background .14s ease, border-color .14s ease, box-shadow .14s ease, opacity .18s ease;
-      user-select: none;
-      /* prevent text-node baseline weirdness */
-      font-size: 0;
-      line-height: 0;
-    }
-    .floatBtn:hover{
-      transform: translateY(-1px);
-      background: radial-gradient(120% 120% at 30% 20%, rgba(255,255,255,.14), rgba(255,255,255,.05)),
-                  rgba(255,255,255,.06);
-      border-color: rgba(255,255,255,.22);
-      box-shadow: 0 18px 58px rgba(0,0,0,.50);
-    }
-    .floatBtn:active{ transform: translateY(0px); box-shadow: 0 14px 46px rgba(0,0,0,.42); }
-    .floatBtn:focus-visible{ outline: 2px solid rgba(124,92,255,.60); outline-offset: 2px; }
-    .floatBtn.isOff{ opacity: .76; }
-
-    .floatBtn svg{
-      width: 22px;
-      height: 22px;
-      display:block;
-      pointer-events:none;
-      filter: drop-shadow(0 10px 20px rgba(0,0,0,.35));
-    }
+    .floatBtn svg{ width: 20px; height: 20px; display:block; pointer-events:none; }
 
     /* Mute slash state */
     .floatBtn.isOff .muteSlash{ opacity: 1; }
-    .floatBtn.isOff .muteSlashGlow{ opacity: .55; filter: blur(.3px); }
+    .floatBtn.isOff .muteSlashGlow{ opacity: .55; filter: blur(.2px); }
     .floatBtn.isOff .iconMain{ opacity: .35; }
+
+    .volWrap{
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0;
+    }
+
+    /* Volume popover (opens to the left of the volume button, centered vertically to it) */
+    .volumePanel{
+      position: absolute;
+      right: calc(100% + 12px);
+      top: 50%;
+      transform: translateY(-50%) translateX(8px) scale(.98);
+      width: 188px;
+      padding: 12px 12px 12px;
+      border-radius: 16px;
+      border: 1px solid rgba(255,255,255,.14);
+      background: radial-gradient(120% 140% at 30% 20%, rgba(255,255,255,.10), rgba(255,255,255,.03)),
+                  rgba(0,0,0,.24);
+      backdrop-filter: blur(16px);
+      box-shadow: 0 18px 62px rgba(0,0,0,.50);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .16s ease, transform .16s ease;
+    }
+    .volumePanel.open{
+      opacity: 1;
+      transform: translateY(-50%) translateX(0px) scale(1);
+      pointer-events: auto;
+    }
+    .volumeTitle{
+      font-size: 12px;
+      font-weight: 900;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,.80);
+      margin-bottom: 10px;
+      text-align: left;
+    }
+    .volSlider{
+      width: 100%;
+      appearance: none;
+      height: 10px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.12);
+      outline: none;
+    }
+    .volSlider::-webkit-slider-thumb{
+      appearance: none;
+      width: 18px;
+      height: 18px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.92);
+      box-shadow: 0 10px 24px rgba(0,0,0,.45);
+      border: 1px solid rgba(255,255,255,.18);
+      cursor: pointer;
+    }
+    .volSlider::-moz-range-thumb{
+      width: 18px;
+      height: 18px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.92);
+      box-shadow: 0 10px 24px rgba(0,0,0,.45);
+      border: 1px solid rgba(255,255,255,.18);
+      cursor: pointer;
+    }
 
     @media (max-width: 880px){
       .floatingControls{
@@ -1160,9 +1181,13 @@
         bottom: calc(env(safe-area-inset-bottom, 0px) + 86px);
       }
       .floatBtn{ width: 46px; height: 46px; }
+      .volumePanel{ width: 170px; right: calc(100% + 10px); }
     }
 
-  </style>
+.floatBtn{ width: 46px; height: 46px; }
+      .volumePanel{ right: calc(100% + 10px); width: 170px; }
+    }
+</style>
 </head>
 
 <body>
@@ -1203,46 +1228,60 @@
   <audio id="bgm" preload="auto" loop></audio>
   
 
+  
+  
   <!-- Floating controls (always visible) -->
   <div class="floatingControls" aria-label="Управление просмотром">
     <button class="floatBtn" id="fsBtn" type="button" title="На весь экран" aria-label="На весь экран">
       <!-- fullscreen icon -->
-      
       <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
         <path class="iconMain" d="M9 4H6.2A2.2 2.2 0 0 0 4 6.2V9" stroke="rgba(255,255,255,.92)" stroke-width="2.2" stroke-linecap="round"/>
         <path class="iconMain" d="M15 4h2.8A2.2 2.2 0 0 1 20 6.2V9" stroke="rgba(255,255,255,.92)" stroke-width="2.2" stroke-linecap="round"/>
         <path class="iconMain" d="M9 20H6.2A2.2 2.2 0 0 1 4 17.8V15" stroke="rgba(255,255,255,.92)" stroke-width="2.2" stroke-linecap="round"/>
         <path class="iconMain" d="M15 20h2.8A2.2 2.2 0 0 0 20 17.8V15" stroke="rgba(255,255,255,.92)" stroke-width="2.2" stroke-linecap="round"/>
-        <path d="M8.6 8.6 4.2 4.2" stroke="rgba(124,92,255,.55)" stroke-width="2.2" stroke-linecap="round" opacity=".0"/>
       </svg>
-
     </button>
 
-    <button class="floatBtn" id="musicBtn" type="button" title="Музыка" aria-label="Музыка" aria-pressed="true">
-      <!-- music note icon -->
-      
-      
+    <button class="floatBtn" id="musicBtn" type="button" title="Музыка" aria-label="Музыка" aria-pressed="false">
+      <!-- speaker icon -->
       <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-        <!-- speaker -->
         <path class="iconMain" d="M11 5.8 7.4 8.6H5.4A2 2 0 0 0 3.4 10.6v2.8a2 2 0 0 0 2 2h2L11 18.2V5.8Z"
               stroke="rgba(255,255,255,.92)" stroke-width="2.2" stroke-linejoin="round" />
-        <!-- waves -->
         <path class="iconMain" d="M15.2 9.2c.8.7 1.2 1.6 1.2 2.8s-.4 2.1-1.2 2.8"
               stroke="rgba(255,255,255,.82)" stroke-width="2.2" stroke-linecap="round" />
         <path class="iconMain" d="M17.9 6.8c1.6 1.5 2.4 3.1 2.4 5.2s-.8 3.7-2.4 5.2"
               stroke="rgba(255,255,255,.58)" stroke-width="2.2" stroke-linecap="round" />
-        <!-- slash when muted -->
         <path class="muteSlashGlow" d="M4.3 4.3 19.7 19.7" stroke="rgba(255,79,216,.55)" stroke-width="7.0" stroke-linecap="round" opacity="0"/>
         <path class="muteSlash" d="M4.3 4.3 19.7 19.7" stroke="rgba(255,255,255,.92)" stroke-width="2.6" stroke-linecap="round" opacity="0"/>
       </svg>
-
-
     </button>
+
+    <div class="volWrap" aria-label="Громкость">
+      <button class="floatBtn" id="volBtn" type="button" title="Громкость" aria-label="Громкость" aria-expanded="false">
+        <!-- sliders icon -->
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M6 7h12" stroke="rgba(255,255,255,.92)" stroke-width="2.2" stroke-linecap="round"/>
+          <path d="M6 12h12" stroke="rgba(255,255,255,.72)" stroke-width="2.2" stroke-linecap="round"/>
+          <path d="M6 17h12" stroke="rgba(255,255,255,.92)" stroke-width="2.2" stroke-linecap="round"/>
+          <circle cx="10" cy="7" r="2.1" fill="rgba(255,255,255,.92)"/>
+          <circle cx="14" cy="12" r="2.1" fill="rgba(255,255,255,.72)"/>
+          <circle cx="12" cy="17" r="2.1" fill="rgba(255,255,255,.92)"/>
+        </svg>
+      </button>
+
+      <div class="volumePanel" id="volumePanel" role="dialog" aria-label="Громкость музыки">
+        <div class="volumeTitle">Громкость</div>
+        <input id="volSlider" class="volSlider" type="range" min="0" max="100" step="1" value="30" aria-label="Громкость фоновой музыки">
+      </div>
+    </div>
   </div>
 
+<input id="volSlider" class="volSlider" type="range" min="0" max="100" step="1" value="30" aria-label="Громкость фоновой музыки">
+      </div>
+    </div>
+  </div>
 
-
-  <!-- Video Modal -->
+<!-- Video Modal -->
   <div class="vmodal" id="vmodal" aria-hidden="true">
     <div class="vmodal__backdrop" id="vmodalBackdrop"></div>
     <div class="vmodal__dialog" role="dialog" aria-modal="true" aria-label="Просмотр видео">
@@ -1325,10 +1364,15 @@
     // ===== Always-visible controls: Fullscreen + Background Music =====
     const fsBtn = document.getElementById('fsBtn');
     const musicBtn = document.getElementById('musicBtn');
+    const volBtn = document.getElementById('volBtn');
+    const volumePanel = document.getElementById('volumePanel');
+    const volSlider = document.getElementById('volSlider');
     const bgm = document.getElementById('bgm');
 
-    let musicEnabled = true;
+    let musicEnabled = false;
     let musicStarted = false;
+    // Volume (0..1). Persisted.
+    let bgmVolume = 0.30;
     let resumeMusicAfterVideo = false;
     let audioUnlocked = false;
 
@@ -1346,7 +1390,7 @@
       if (!bgm.src) bgm.src = url;
       bgm.loop = true;
       bgm.preload = 'auto';
-      bgm.volume = 0.35;
+      bgm.volume = bgmVolume;
       try{
         await bgm.play();
         musicStarted = true;
@@ -1587,13 +1631,14 @@
         const nbH = Math.max(1, nomineesBlock.clientHeight);
 
         // Reserve some space for media title + gaps (scaled)
-        const reserve = Math.round(84 * s);
+        const reserve = Math.round(104 * s);
 
         // Allow media (video/custom) to take most of nomineesBlock height without inner scroll
-        const pad = Math.round(14 * s);
+        // but keep extra room for shadows near the bottom of the card
+        const pad = Math.round(26 * s);
         let mediaMaxH = nbH - reserve - pad;
         // Clamp to a sane range and also respect overall panel height
-        mediaMaxH = Math.max(180, Math.min(mediaMaxH, h * 0.62));
+        mediaMaxH = Math.max(180, Math.min(mediaMaxH, h * 0.60));
         page.style.setProperty('--mediaMaxH', `${Math.round(mediaMaxH)}px`);
       });
     }
@@ -2384,6 +2429,47 @@ const act = el('div', 'introActions');
       try{
         setMusicButton();
         updateFullscreenButton();
+
+        // Volume UI
+        function initVolumeControls(){
+          try{
+            const saved = localStorage.getItem('zeart_bgm_volume');
+            if (saved != null){
+              const v = Number(saved);
+              if (Number.isFinite(v)) bgmVolume = Math.max(0, Math.min(1, v));
+            }
+          }catch(e){}
+          if (bgm) bgm.volume = bgmVolume;
+          if (volSlider) volSlider.value = String(Math.round(bgmVolume * 100));
+
+          const setPanel = (open) => {
+            if (!volumePanel || !volBtn) return;
+            volumePanel.classList.toggle('open', !!open);
+            volBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
+          };
+
+          volBtn && volBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const open = !(volumePanel && volumePanel.classList.contains('open'));
+            setPanel(open);
+          });
+
+          // close when clicking outside
+          document.addEventListener('pointerdown', (e) => {
+            if (!volumePanel || !volBtn) return;
+            if (volumePanel.contains(e.target) || volBtn.contains(e.target)) return;
+            setPanel(false);
+          }, { passive:true });
+
+          volSlider && volSlider.addEventListener('input', () => {
+            const v = Math.max(0, Math.min(1, Number(volSlider.value) / 100));
+            bgmVolume = v;
+            if (bgm) bgm.volume = bgmVolume;
+            try{ localStorage.setItem('zeart_bgm_volume', String(bgmVolume)); }catch(e){}
+          });
+        }
+
+        initVolumeControls();
         document.addEventListener('fullscreenchange', updateFullscreenButton);
 
         // Try to start music right away after загрузки (может быть заблокировано политикой autoplay)
