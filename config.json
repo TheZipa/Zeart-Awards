@@ -53,6 +53,20 @@
       ]
     },
     {
+      "id": "pedik",
+      "title": "Педик года",
+      "description": "Самый главный гейчик",
+      "nominees": [
+        {
+          "type": "discord",
+          "id": "670263400755888128",
+          "name": "-Dettlaff-",
+          "tag": "@x_4_8_dettlaff_8_4_x",
+          "avatarUrl": "https://cdn.discordapp.com/avatars/670263400755888128/8a2f8892d217b9e1d74b239a50e53b78.png?size=256"
+        }
+      ]
+    },
+    {
       "id": "clip",
       "title": "Клип года",
       "description": "Лучший клип в этом году",
@@ -121,7 +135,7 @@
     {
       "id": "beginners",
       "title": "Новички года",
-      "description": "Самые хорошие новички сервера",
+      "description": "Лучшие новички сервера в этом году",
       "nominees": [
         {
           "type": "discord",
@@ -142,7 +156,7 @@
     {
       "id": "kirick",
       "title": "Кирик года",
-      "description": "Главный кирик?",
+      "description": "Главный кирик",
       "nominees": [
         {
           "type": "discord",
@@ -168,20 +182,6 @@
       ]
     },
     {
-      "id": "dodep",
-      "title": "Додеп года",
-      "description": "За самое больше депнутое состояние",
-      "nominees": [
-        {
-          "type": "discord",
-          "id": "670263400755888128",
-          "name": "-Dettlaff-",
-          "tag": "@x_4_8_dettlaff_8_4_x",
-          "avatarUrl": "https://cdn.discordapp.com/avatars/670263400755888128/8a2f8892d217b9e1d74b239a50e53b78.png?size=256"
-        }
-      ]
-    },
-    {
       "id": "drop",
       "title": "Дроп года",
       "description": "За великий дроп Satisfactory 4 фаза",
@@ -192,6 +192,27 @@
           "name": "TheZipa",
           "tag": "@thezipa",
           "avatarUrl": "https://cdn.discordapp.com/avatars/290506098052694028/a_ee53e44f58aecc5602f0a73e4e8e5ae1.gif?size=256"
+        },
+        {
+          "type": "discord",
+          "id": "248765837698269184",
+          "name": "Bodraugr",
+          "tag": "@nothingbefine",
+          "avatarUrl": "https://cdn.discordapp.com/avatars/248765837698269184/05cea2fa392e304228eb3e026b6e483e.png?size=256"
+        }
+      ]
+    },
+    {
+      "id": "dodep",
+      "title": "Додеп года",
+      "description": "За самое больше депнутое состояние",
+      "nominees": [
+        {
+          "type": "discord",
+          "id": "670263400755888128",
+          "name": "-Dettlaff-",
+          "tag": "@x_4_8_dettlaff_8_4_x",
+          "avatarUrl": "https://cdn.discordapp.com/avatars/670263400755888128/8a2f8892d217b9e1d74b239a50e53b78.png?size=256"
         }
       ]
     },
