@@ -122,7 +122,7 @@
 	{
       "id": "beginners",
       "title": "Новички года",
-      "description": "Самые хорошие новички сервера",
+      "description": "Лучшие новички сервера в этом году",
       "nominees": [
         {
           "type": "discord",
@@ -137,7 +137,7 @@
 	{
       "id": "kirick",
       "title": "Кирик года",
-      "description": "Главный кирик?",
+      "description": "Главный кирик",
       "nominees": [
         {
           "type": "discord",

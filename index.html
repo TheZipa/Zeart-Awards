@@ -1052,6 +1052,116 @@
       padding: 0; /* let nomineesBlock padding create the vertical air */
     }
 
+    /* Floating always-visible controls (fullscreen + music) */
+    .floatingControls{
+      position: fixed;
+      right: 18px;
+      bottom: calc(env(safe-area-inset-bottom, 0px) + 90px);
+      z-index: 70;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      pointer-events: auto;
+    }
+    Npx;
+      font-size: 0;
+      line-height: 0;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform .14s ease, background .14s ease, border-color .14s ease, box-shadow .14s ease, opacity .18s ease;
+      user-select: none;
+    }
+    .floatBtn:hover{
+      transform: translateY(-1px);
+      background: rgba(255,255,255,.08);
+      border-color: rgba(255,255,255,.20);
+      box-shadow: 0 18px 55px rgba(0,0,0,.42);
+    }
+    .floatBtn:active{ transform: translateY(0px); box-shadow: 0 10px 38px rgba(0,0,0,.35); }
+    .floatBtn:focus-visible{ outline: 2px solid rgba(124,92,255,.60); outline-offset: 2px; }
+    .floatBtn.isOff{ opacity: .72; }
+    .floatBtn svg{ width: 20px; height: 20px; display:block; }
+
+    .floatBtn.isOff .muteSlash{ opacity: 1; }
+    .floatBtn.isOff .muteSlashGlow{ opacity: .55; filter: blur(.2px); }
+    .floatBtn.isOff .noteFill,
+    .floatBtn.isOff .noteStroke,
+    .floatBtn.isOff .noteStroke2{ opacity: .35; }
+
+
+    @media (max-width: 880px){
+      .floatingControls{
+        right: 12px;
+        bottom: calc(env(safe-area-inset-bottom, 0px) + 86px);
+      }
+      .floatBtn{ width: 46px; height: 46px; }
+    }
+
+/* Floating always-visible controls (fullscreen + music) */
+    .floatingControls{
+      position: fixed;
+      right: 18px;
+      bottom: calc(env(safe-area-inset-bottom, 0px) + 90px);
+      z-index: 70;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      pointer-events: auto;
+    }
+    .floatBtn{
+      width: 48px;
+      height: 48px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.14);
+      background: radial-gradient(120% 120% at 30% 20%, rgba(255,255,255,.10), rgba(255,255,255,.04)),
+                  rgba(0,0,0,.22);
+      backdrop-filter: blur(14px);
+      box-shadow: 0 14px 46px rgba(0,0,0,.42);
+      color: rgba(255,255,255,.92);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform .14s ease, background .14s ease, border-color .14s ease, box-shadow .14s ease, opacity .18s ease;
+      user-select: none;
+      /* prevent text-node baseline weirdness */
+      font-size: 0;
+      line-height: 0;
+    }
+    .floatBtn:hover{
+      transform: translateY(-1px);
+      background: radial-gradient(120% 120% at 30% 20%, rgba(255,255,255,.14), rgba(255,255,255,.05)),
+                  rgba(255,255,255,.06);
+      border-color: rgba(255,255,255,.22);
+      box-shadow: 0 18px 58px rgba(0,0,0,.50);
+    }
+    .floatBtn:active{ transform: translateY(0px); box-shadow: 0 14px 46px rgba(0,0,0,.42); }
+    .floatBtn:focus-visible{ outline: 2px solid rgba(124,92,255,.60); outline-offset: 2px; }
+    .floatBtn.isOff{ opacity: .76; }
+
+    .floatBtn svg{
+      width: 22px;
+      height: 22px;
+      display:block;
+      pointer-events:none;
+      filter: drop-shadow(0 10px 20px rgba(0,0,0,.35));
+    }
+
+    /* Mute slash state */
+    .floatBtn.isOff .muteSlash{ opacity: 1; }
+    .floatBtn.isOff .muteSlashGlow{ opacity: .55; filter: blur(.3px); }
+    .floatBtn.isOff .iconMain{ opacity: .35; }
+
+    @media (max-width: 880px){
+      .floatingControls{
+        right: 12px;
+        bottom: calc(env(safe-area-inset-bottom, 0px) + 86px);
+      }
+      .floatBtn{ width: 46px; height: 46px; }
+    }
+
   </style>
 </head>
 
@@ -1087,6 +1197,49 @@
   <button class="bottomNext" id="nextBtn" title="Следующая страница">
     Далее <span class="arrow"></span>
   </button>
+
+
+  <!-- Background music (will start after first user interaction due to browser autoplay rules) -->
+  <audio id="bgm" preload="auto" loop></audio>
+  
+
+  <!-- Floating controls (always visible) -->
+  <div class="floatingControls" aria-label="Управление просмотром">
+    <button class="floatBtn" id="fsBtn" type="button" title="На весь экран" aria-label="На весь экран">
+      <!-- fullscreen icon -->
+      
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path class="iconMain" d="M9 4H6.2A2.2 2.2 0 0 0 4 6.2V9" stroke="rgba(255,255,255,.92)" stroke-width="2.2" stroke-linecap="round"/>
+        <path class="iconMain" d="M15 4h2.8A2.2 2.2 0 0 1 20 6.2V9" stroke="rgba(255,255,255,.92)" stroke-width="2.2" stroke-linecap="round"/>
+        <path class="iconMain" d="M9 20H6.2A2.2 2.2 0 0 1 4 17.8V15" stroke="rgba(255,255,255,.92)" stroke-width="2.2" stroke-linecap="round"/>
+        <path class="iconMain" d="M15 20h2.8A2.2 2.2 0 0 0 20 17.8V15" stroke="rgba(255,255,255,.92)" stroke-width="2.2" stroke-linecap="round"/>
+        <path d="M8.6 8.6 4.2 4.2" stroke="rgba(124,92,255,.55)" stroke-width="2.2" stroke-linecap="round" opacity=".0"/>
+      </svg>
+
+    </button>
+
+    <button class="floatBtn" id="musicBtn" type="button" title="Музыка" aria-label="Музыка" aria-pressed="true">
+      <!-- music note icon -->
+      
+      
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <!-- speaker -->
+        <path class="iconMain" d="M11 5.8 7.4 8.6H5.4A2 2 0 0 0 3.4 10.6v2.8a2 2 0 0 0 2 2h2L11 18.2V5.8Z"
+              stroke="rgba(255,255,255,.92)" stroke-width="2.2" stroke-linejoin="round" />
+        <!-- waves -->
+        <path class="iconMain" d="M15.2 9.2c.8.7 1.2 1.6 1.2 2.8s-.4 2.1-1.2 2.8"
+              stroke="rgba(255,255,255,.82)" stroke-width="2.2" stroke-linecap="round" />
+        <path class="iconMain" d="M17.9 6.8c1.6 1.5 2.4 3.1 2.4 5.2s-.8 3.7-2.4 5.2"
+              stroke="rgba(255,255,255,.58)" stroke-width="2.2" stroke-linecap="round" />
+        <!-- slash when muted -->
+        <path class="muteSlashGlow" d="M4.3 4.3 19.7 19.7" stroke="rgba(255,79,216,.55)" stroke-width="7.0" stroke-linecap="round" opacity="0"/>
+        <path class="muteSlash" d="M4.3 4.3 19.7 19.7" stroke="rgba(255,255,255,.92)" stroke-width="2.6" stroke-linecap="round" opacity="0"/>
+      </svg>
+
+
+    </button>
+  </div>
+
 
 
   <!-- Video Modal -->
@@ -1139,7 +1292,7 @@
       nominees: [
       {
         type: "video",
-        videoUrl: "assets/ytro1.mp4",
+        videoUrl: "assets/pivos-door.mp4",
         title: "Утро"
       }
       ]
@@ -1169,6 +1322,140 @@
     const dropdown = document.getElementById('dropdown');
     const topbar = document.getElementById('topbar');
 
+    // ===== Always-visible controls: Fullscreen + Background Music =====
+    const fsBtn = document.getElementById('fsBtn');
+    const musicBtn = document.getElementById('musicBtn');
+    const bgm = document.getElementById('bgm');
+
+    let musicEnabled = true;
+    let musicStarted = false;
+    let resumeMusicAfterVideo = false;
+    let audioUnlocked = false;
+
+    function setMusicButton(){
+      if (!musicBtn) return;
+      musicBtn.classList.toggle('isOff', !musicEnabled);
+      musicBtn.setAttribute('aria-pressed', musicEnabled ? 'true' : 'false');
+      musicBtn.title = musicEnabled ? 'Музыка: включена' : 'Музыка: выключена';
+    }
+
+    async function startMusic(){
+      if (!bgm || musicStarted) return;
+      // Optional config field: bgmUrl. Fallback to assets/bgm.mp3
+      const url = (cfg && cfg.bgmUrl) ? String(cfg.bgmUrl) : 'assets/bgm.mp3';
+      if (!bgm.src) bgm.src = url;
+      bgm.loop = true;
+      bgm.preload = 'auto';
+      bgm.volume = 0.35;
+      try{
+        await bgm.play();
+        musicStarted = true;
+      }catch(e){
+        // Autoplay may be blocked; user can press the music button.
+      }
+    }
+
+    // --- Firework SFX (random .ogg, synced with explosions, supports overlaps) ---
+    const DEFAULT_SFX = [
+      "assets/firework_1.ogg",
+      "assets/firework_2.ogg",
+      "assets/firework_3.ogg",
+      "assets/firework_4.ogg",
+    ];
+
+    // Prefer config.sfxFireworkUrls (array) -> else config.sfxFireworkUrl (single) -> else DEFAULT_SFX
+    function getSfxList(){
+      let list = (cfg && Array.isArray(cfg.sfxFireworkUrls) && cfg.sfxFireworkUrls.length)
+        ? cfg.sfxFireworkUrls.map(String).filter(Boolean)
+        : [];
+      if (!list.length && cfg && cfg.sfxFireworkUrl) list = [String(cfg.sfxFireworkUrl)];
+      if (!list.length) list = DEFAULT_SFX;
+      return list;
+    }
+
+    function pickSfxUrl(){
+      const list = getSfxList();
+      return list[(Math.random() * list.length) | 0];
+    }
+
+    // Pool allows multiple explosions to sound even when scrolling fast
+    const sfxPool = Array.from({ length: 6 }, () => {
+      const a = new Audio();
+      a.preload = "auto";
+      return a;
+    });
+    let sfxPtr = 0;
+
+    async function unlockAudioOnce(){
+      if (audioUnlocked) return;
+      audioUnlocked = true;
+      try{
+        const url = pickSfxUrl();
+        const a = sfxPool[0];
+        a.src = url;
+        a.volume = 0;
+        await a.play();
+        a.pause();
+        a.currentTime = 0;
+        a.volume = 0.55;
+      }catch(e){}
+    }
+
+    function playFireworkSfx(){
+      try{
+        if (!audioUnlocked) return; // can’t play without a user gesture
+        const url = pickSfxUrl();
+        const a = sfxPool[sfxPtr++ % sfxPool.length];
+        if (a.src !== url) a.src = url;
+
+        // Restart immediately even if it was still playing
+        try{ a.pause(); }catch(e){}
+        try{ a.currentTime = 0; }catch(e){}
+        a.volume = 0.55;
+
+        a.play().catch(()=>{});
+      }catch(e){}
+    }
+
+
+    async function applyMusicState(){
+      if (!bgm) return;
+      if (!musicEnabled){
+        try{ bgm.pause(); }catch(e){}
+        return;
+      }
+      await startMusic();
+      try{ if (bgm.paused) await bgm.play(); }catch(e){}
+    }
+
+    async function toggleMusic(){
+      musicEnabled = !musicEnabled;
+      setMusicButton();
+      await applyMusicState();
+    }
+
+    function isFullscreen(){
+      return !!document.fullscreenElement;
+    }
+
+    async function toggleFullscreen(){
+      try{
+        if (isFullscreen()){
+          await document.exitFullscreen();
+        }else{
+          await document.documentElement.requestFullscreen({ navigationUI: "hide" });
+        }
+      }catch(e){}
+      updateFullscreenButton();
+    }
+
+    function updateFullscreenButton(){
+      if (!fsBtn) return;
+      fsBtn.title = isFullscreen() ? 'Выйти из полноэкранного режима' : 'На весь экран';
+      fsBtn.setAttribute('aria-label', fsBtn.title);
+    }
+
+
     const subtitleTop = document.getElementById('subtitleTop');
     const siteTitleTop = document.getElementById('siteTitleTop');
 
@@ -1188,6 +1475,10 @@
 
     function openVideoModal(url, title){
       try{
+        // Stop background music during video (if it was enabled)
+        resumeMusicAfterVideo = !!musicEnabled;
+        if (musicEnabled && bgm){ try{ bgm.pause(); }catch(e){} }
+
         vmodalTitle.textContent = title || "Видео";
         vmodalVideo.pause();
         vmodalVideo.removeAttribute('src');
@@ -1208,6 +1499,14 @@
         vmodalVideo.removeAttribute('src');
         vmodalVideo.load();
       }catch(e){}
+      // Resume background music only if it was enabled when opening the video
+      if (resumeMusicAfterVideo){
+        applyMusicState();
+      }else{
+        // keep muted/off
+        try{ bgm && bgm.pause(); }catch(e){}
+      }
+
     }
 
     vmodalBackdrop.addEventListener('click', closeVideoModal);
@@ -1878,6 +2177,8 @@ const act = el('div', 'introActions');
       }
 
       function addFireworkMega(x, y){
+        // SFX exactly when the firework explodes
+        playFireworkSfx();
         const colFn = pick(palette);
         bursts.push({ kind:'flare', x, y, colFn, life: 34, age: 0, radius: rand(58, 78) });
 
@@ -2078,7 +2379,32 @@ const act = el('div', 'introActions');
     (async function init(){
       cfg = await loadConfig();
       render();
+
+      // Controls (fullscreen + music)
+      try{
+        setMusicButton();
+        updateFullscreenButton();
+        document.addEventListener('fullscreenchange', updateFullscreenButton);
+
+        // Try to start music right away after загрузки (может быть заблокировано политикой autoplay)
+        applyMusicState();
+
+        // Fallback: start/unlock audio on first user interaction
+        const first = async () => { await unlockAudioOnce(); if (!musicEnabled) return; await startMusic(); };
+        window.addEventListener('pointerdown', first, { once:true, passive:true });
+        window.addEventListener('keydown', first, { once:true, passive:true });
+        window.addEventListener('wheel', first, { once:true, passive:true });
+
+        // Buttons
+        fsBtn && fsBtn.addEventListener('click', (e) => { e.stopPropagation(); toggleFullscreen(); });
+        musicBtn && musicBtn.addEventListener('click', (e) => { e.stopPropagation(); toggleMusic(); });
+
+        // If user returns to tab, keep music looping if enabled
+        document.addEventListener('visibilitychange', () => {
+          if (!document.hidden && musicEnabled) applyMusicState();
+        });
+      }catch(e){}
     })();
-  </script>
+</script>
 </body>
 </html>
